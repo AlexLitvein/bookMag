@@ -7,7 +7,7 @@ function App() {
     document.getElementById('btnstart').addEventListener('click', (e) => {
       document.getElementById('ani_p').beginElement();
     });
-    
+
   }, []); // componentDidMount()
 
   return (
@@ -18,7 +18,10 @@ function App() {
         <button id="btn_inc" type="button">+H</button>
         <button id="btn_dec" type="button">-H</button>
       </div>
-      <SvgViewPort ></SvgViewPort>
+      <div className="wrpSvg">
+        <SvgViewPort ></SvgViewPort>
+      </div>
+
     </div>
   );
 }
