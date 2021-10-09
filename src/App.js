@@ -1,23 +1,24 @@
-import logo from './logo.svg';
+import React, { useRef, useCallback, useEffect } from 'react';
+import SvgViewPort from './svg_vport';
 import './App.css';
-   
+
 function App() {
+  useEffect(() => {
+    document.getElementById('btnstart').addEventListener('click', (e) => {
+      document.getElementById('ani_p').beginElement();
+    });
+    
+  }, []); // componentDidMount()
+
   return (
+
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div id="controls">
+        <button id="btnstart" type="button">Start</button>
+        <button id="btn_inc" type="button">+H</button>
+        <button id="btn_dec" type="button">-H</button>
+      </div>
+      <SvgViewPort ></SvgViewPort>
     </div>
   );
 }
