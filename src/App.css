@@ -45,8 +45,8 @@ svg {
 
 .axis{
   stroke: black;
-  /* stroke-width: 10px;  */
- 
+  stroke-width: 1px;
+  marker: url('#mrkVHAxis');
 }
 
 .txt-axis{

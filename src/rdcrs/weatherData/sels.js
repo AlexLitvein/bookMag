@@ -1,0 +1,1 @@
+export const selSensData = (state) => state.sensData;
