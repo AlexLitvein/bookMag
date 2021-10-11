@@ -7,6 +7,13 @@ const SvgViewPort = () => {
     console.log("create SvgViewPort");
     // let strPath = "";
     // let d, to;
+    const padding = {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
+    };
+
     const domElm = useRef(null);
     const getParentSize = () => {
         return domElm.current.parentElement.getBoundingClientRect();
@@ -16,13 +23,7 @@ const SvgViewPort = () => {
         console.log('fillPath');
         let val = 0;
         const min = 0;
-        const max = 50;
-        const padding = {
-            top: 20,
-            right: 20,
-            bottom: 20,
-            left: 20
-        };
+        const max = 50;        
 
         // const size = this.axle.graph.clientSize(); // !!!!
         // let rc = this.axle.size();
