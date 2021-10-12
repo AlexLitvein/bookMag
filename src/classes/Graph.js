@@ -2,19 +2,20 @@ class Graph {
     constructor(w, h) {
         this.w = w;
         this.h = h;
-        this.axis = [];
-        this.dataSets = [];
-        this.markers = [];
+        this.axis = {};
+        this.dataSets = {};
+        this.markers = {};
         // this.style; // ?
         this.padding = { top: 15, right: 10, bottom: 60, left: 34 };
+        //this.scaleX=100;
 
         this.cut = function (n) {
             return Math.floor(n) + 0.5;
         }
     }
 
-    width() { return this.w; }
-    height() { return this.h; }
+    // width() { return this.w; }
+    // height() { return this.h; }
 
     clientRect() {
         return {
@@ -32,8 +33,8 @@ class Graph {
 
     getOrthoPath(x, y, size, numSeg, type) {
         let d = `M${this.cut(x)} ${this.cut(y)}`;
-        let lnSeg = size / numSeg;
-        lnSeg = type === 'h' ? lnSeg : -lnSeg;
+        let lnSeg = this.cut(size / numSeg);
+        // lnSeg = type === 'h' ? lnSeg : -lnSeg;
         for (let i = 0; i < numSeg; i++) {
             d += (type + lnSeg);
         }
@@ -46,14 +47,10 @@ class Graph {
         const min = 0;
         const max = 50;
 
-        // const size = this.axle.graph.clientSize(); // !!!!
-        // let rc = this.axle.size();
         let res = { d: 'M', to: 'M' };
         for (let i = 0; i < data.length; i++) {
             val = data[i]['t'];
             val = Math.round(((val - min) / (max - min)) * size.h);
-            // res.d += `${pos.x + 0.5 + lnSeg * i} ${pos.y + 0.5}`;
-            // res.to += `${pos.x + 0.5 + lnSeg * i} ${(pos.y + 0.5) - val}`;
             res.d += `${this.cut(pos.x + lnSeg * i)} ${this.cut(pos.y)}`;
             res.to += `${this.cut(pos.x + lnSeg * i)} ${this.cut(pos.y - val)}`;
 
@@ -64,82 +61,30 @@ class Graph {
         }
         return res;
     }
+    
+    addMarker(id, w, h, refX, refY, cls) {        
+        this.markers[id] = { w, h, refX, refY, cls };
+    }
 
-    // origin = () => {
-    //     return {
-    //         x: this.padding.left,
-    //         y: this.height - this.padding.bottom
-    //     };
-    // }
+    addAxle(id, name, type, cls) {
+        const rc = this.clientRect();
+        let p;
+        if (type === 'h') {
+            p = this.getOrthoPath(rc.left, rc.bottom, rc.right-rc.left, 1, type);
+        } else {
+            p = this.getOrthoPath(rc.left, rc.top, rc.bottom-rc.top, 1, type);
+        }
+        this.axis[id] = { name, type, cls, d: p };
+    }
 
-    // clientSize = () => {
-    //     return {
-    //         w: this.width - this.padding.left - this.padding.right,
-    //         h: this.height - this.padding.bottom - this.padding.top
-    //     };
-    // }
+    addDataSet(id, name, url, count, min, max){
+        this.dataSets[id] = { name, url, count, min, max };
+    }
 
+    addAxleUnitMeasure(){
 
-
-    //addAxis(axle) {
-    // const axis = new MyGraphAxis(id, type, this);
-    // axle.graph = this;
-    // axle.resize(); // after^^^
-    // this.axis.push(axle);
-    // if (axle.type === 'h') {
-    //     this.axisX = axle;
-    // }
-    // if (axle.type === 'v') {
-    //     this.axisY = axle;
-    // }
-    //}
-
-    // addGraphData(graphData) {
-    //     // const gd = new GraphData(id, idAnim, begin, this);
-    //     graphData.graph = this;
-    //     this.graphsData.push(graphData);
-    //     // return gd;
-    //     // this.axisX.resize(graphData.dataCount());
-    // }
-
-
-    // localToSVG(pos) {
-    //     return { x: this.origin.x + pos.x, y: this.origin.y - pos.y }
-    // }
-
-    // _resize(w, h) {
-    //     let rc = this.el.parentElement.getBoundingClientRect();
-    //     this.width = w || rc.width;
-    //     this.height = h || rc.height;
-    //     this.setAttributes({ "width": this.width, "height": this.height });
-    // }
-
+    }
 
 }
 
-// export class Graph {
-//     constructor(w, h) {
-//         this.width = w;
-//         this.height = h;
-//         this.axis = [];
-//         this.dataSets = [];
-//         this.markers = [];
-//         this.style; // ?
-//         this.padding = { top: 15, right: 10, bottom: 60, left: 34 };
-//     }
-
-//     clientRect = () => {
-//         return {
-//             x: this.padding.left,
-//             y: this.height - this.padding.bottom,
-//             w: this.width - this.padding.left - this.padding.right,
-//             h: this.height - this.padding.bottom - this.padding.top
-//         };
-//     }
-
-
-
-// }
-
-// export let MyGraph = new Graph(320, 320);
 export default new Graph(320, 320);
