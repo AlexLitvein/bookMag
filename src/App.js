@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useEffect } from 'react';
-import SvgViewPort from './comonents/SvgViewPort';
+import SvgViewPort from './react_comp/SvgViewPort';
 import './App.css';
 
 
@@ -21,8 +21,8 @@ function App() {
       </div>
       <div className="wrpSvg">
         <SvgViewPort >
-         
-          
+
+
 
         </SvgViewPort>
       </div>
