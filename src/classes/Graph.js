@@ -29,6 +29,21 @@ class Graph {
         };
     }
 
+    clientSize() {
+        return {
+            w: this.w - this.padding.left - this.padding.right,
+            h: this.h - this.padding.top - this.padding.bottom
+        };
+    }
+
+    clientWidth() {
+        return this.w - this.padding.left - this.padding.right;
+    }
+
+    clientHeight() {
+        return this.h - this.padding.top - this.padding.bottom;
+    }
+
     resize(w, h) {
         this.w = w;
         this.h = h;
@@ -44,26 +59,48 @@ class Graph {
         return d;
     }
 
-    fillPath(pos, size, lnSeg, data) {
+    buildPathObj(min, max, data) {
         // console.log('fillPath');
+        const { w, h } = this.clientSize();
         let val = 0;
-        const min = 0;
-        const max = 50;
-
+        let lnSeg = w / data.length;
         let res = { d: 'M', to: 'M' };
+
         for (let i = 0; i < data.length; i++) {
             val = data[i]['t'];
-            val = Math.round(((val - min) / (max - min)) * size.h);
-            res.d += `${this.cut(pos.x + lnSeg * i)} ${this.cut(pos.y)}`;
-            res.to += `${this.cut(pos.x + lnSeg * i)} ${this.cut(pos.y - val)}`;
-
-            if (i < data.length - 1) {
-                res.d += 'L';
-                res.to += 'L';
-            }
+            val = Math.round(((val - min) / (max - min)) * h);
+            res.d += `${this.cut(lnSeg * i)} ${this.cut(0)}L`;
+            res.to += `${this.cut(lnSeg * i)} ${this.cut(- val)}L`;
         }
+        res.d[res.d.length - 1] = '';
+        res.to[res.to.length - 1] = '';
+        // res.name = name;
+        // res.cls = cls;
+
         return res;
     }
+
+    // buildPath(pos, size, lnSeg, data) {
+    //     // console.log('fillPath');
+
+    //     let val = 0;
+    //     const min = 0;
+    //     const max = 50;
+
+    //     let res = { d: 'M', to: 'M' };
+    //     for (let i = 0; i < data.length; i++) {
+    //         val = data[i]['t'];
+    //         val = Math.round(((val - min) / (max - min)) * size.h);
+    //         res.d += `${this.cut(pos.x + lnSeg * i)} ${this.cut(pos.y)}`;
+    //         res.to += `${this.cut(pos.x + lnSeg * i)} ${this.cut(pos.y - val)}`;
+
+    //         if (i < data.length - 1) {
+    //             res.d += 'L';
+    //             res.to += 'L';
+    //         }
+    //     }
+    //     return res;
+    // }
 
     addMarker(id, w, h, refX, refY, cls) {
         this.markers[id] = { w, h, refX, refY, cls };
@@ -93,6 +130,10 @@ class Graph {
         // dispatch(delChat(id));
 
     }
+
+
+
+
 
 }
 

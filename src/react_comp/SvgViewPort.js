@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import MyGraph from "../classes/Graph";
+import { fetchSensData } from "../rdcrs/weatherData/acts";
 import { selSensData } from "../rdcrs/weatherData/sels";
 import { Axis, Marker } from './Axis';
 
@@ -26,6 +27,8 @@ const SvgViewPort = () => {
     const [h, setH] = useState(0);
     const [strPath, setStrPath] = useState(MyGraph.fillPath({ x: 0, y: 70 }, { w: 200, h: 200 }, 50, sd[0]));
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         // setW(getParentSize().width);
         // setH(getParentSize().height);
@@ -34,6 +37,8 @@ const SvgViewPort = () => {
         setW(width);
         setH(height);
         MyGraph.resize(width, height);
+
+        dispatch(fetchSensData(0));
         //strPath = fillPath({ x: 0, y: 70 }, { w: 200, h: 200 }, 20, sd[0]);
         // ({ d, to } = strPath);
 
@@ -50,6 +55,7 @@ const SvgViewPort = () => {
 
     return (
         <svg id="graph" ref={domElm} width={w} height={h}>
+
             <animate id="ani_p" begin="0s;indefinite" xlinkHref="#data_p" attributeName="d" dur="0.5" fill="freeze" to={strPath.to} />
             <path id="data_p" class="path-data" d={strPath.d}></path>
 
