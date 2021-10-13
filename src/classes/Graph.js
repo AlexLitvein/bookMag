@@ -1,3 +1,6 @@
+// import { useDispatch } from "react-redux";
+
+
 class Graph {
     constructor(w, h) {
         this.w = w;
@@ -61,8 +64,8 @@ class Graph {
         }
         return res;
     }
-    
-    addMarker(id, w, h, refX, refY, cls) {        
+
+    addMarker(id, w, h, refX, refY, cls) {
         this.markers[id] = { w, h, refX, refY, cls };
     }
 
@@ -70,18 +73,24 @@ class Graph {
         const rc = this.clientRect();
         let p;
         if (type === 'h') {
-            p = this.getOrthoPath(rc.left, rc.bottom, rc.right-rc.left, 1, type);
+            p = this.getOrthoPath(rc.left, rc.bottom, rc.right - rc.left, 1, type);
         } else {
-            p = this.getOrthoPath(rc.left, rc.top, rc.bottom-rc.top, 1, type);
+            p = this.getOrthoPath(rc.left, rc.top, rc.bottom - rc.top, 1, type);
         }
         this.axis[id] = { name, type, cls, d: p };
     }
 
-    addDataSet(id, name, url, count, min, max){
+    addDataSet(id, name, url, count, min, max) {
         this.dataSets[id] = { name, url, count, min, max };
     }
 
-    addAxleUnitMeasure(){
+    addAxleUnitMeasure() {
+
+    }
+
+    fetchSensData() {
+        // const dispatch = useDispatch();
+        // dispatch(delChat(id));
 
     }
 
