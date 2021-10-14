@@ -60,7 +60,7 @@ class Graph {
     }
 
     buildPathObj(min, max, data) {
-        // console.log('fillPath');
+        console.log('buildPathObj',data);
         const { w, h } = this.clientSize();
         let val = 0;
         let lnSeg = w / data.length;

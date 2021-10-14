@@ -1,14 +1,3 @@
-// import firebase from "firebase";
-// import { addMsg, CHATS_ADD_CHAT, CHATS_ADD_MSG, CHATS_DEL_CHAT } from './reducerChats/actions';
-// import { PROFILE_SET_NAME, PROFILE_SHOW_NAME } from "./reducerProfile/actions";
-
-import MyGraph from '../classes/Graph';
-import { setError, setLoaded, setLoading } from '../rdcrs/status/act';
-import { addSensData, ADD_SENS_DATA, FETCH_SENS_DATA } from '../rdcrs/weatherData/acts';
-
-// import { GISTS_SET_LOADING, setGistsSuccess, setGistsFailure } from './reduserGists/actions';
-const { put, takeLatest, delay } = require('redux-saga/effects');
-
 const data1 = [
     { "_id": "2021-01-04T12:00:00.032Z", "t": -24.2, "p": 779.7, "h": 62.3 },
     { "_id": "2021-01-04T13:00:00.033Z", "t": -23.9, "p": 779.8, "h": 62.8 },
@@ -46,50 +35,4 @@ const data3 = [
     { "_id": "2021-01-05T17:00:00.032Z", "t": -24.7, "p": 778.3, "h": 70 }
 ];
 
-const remote_data = [data1, data2, data3]; //
-
-function splitObjDataToArr(arrObjects) {
-    const out = {};
-    if (arrObjects.length !== 0) {
-        let o = arrObjects[0];
-        for (const key in o) {
-            out[key] = [];
-        }
-
-        arrObjects.forEach(el => {
-            for (const key in el) {
-                out[key].push(el[key]);
-            }
-        });
-    }
-    return out;
-}
-
-// function getRemoteData(dataSets, idx) {
-//     const o = splitObjDataToArr(dataSets[idx]);
-//     const out = [];
-//     for (const key in o) {
-//         out.push(MyGraph.buildPathObj(key, 'dff', 0, 100, o));
-//     }
-//     return out;
-// }
-
-
-
-function* fetchSensData(act) {
-    try {
-        yield put(setLoading());
-        const o = yield splitObjDataToArr(remote_data[act.payload]);
-        yield put(addSensData(MyGraph.buildPathObj(0, 100, o.h)));
-        // for (const key in o) {
-            // yield put(addSensData(MyGraph.buildPathObj(key, 'dff', 0, 100, o)));
-        // }
-        yield put(setLoaded());
-    } catch (e) {
-        yield put(setError(e.message));
-    }
-};
-
-export default function* MySaga() {
-    yield takeLatest(FETCH_SENS_DATA, fetchSensData);
-}
+export const remote_data = [data1, data2, data3]; //

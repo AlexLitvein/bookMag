@@ -1,4 +1,4 @@
-import * as actions from "./act"
+import * as actions from "./acts"
 
 export const STATUS = {
     EMPTY: 0,
@@ -14,29 +14,29 @@ const initialState = {
 
 export default function statusRdcr(state = initialState, action) {
     switch (action.type) {
-        case actions.SET_EMPTY_STATUS:
+        case action.SET_EMPTY_STATUS:
             return {
                 ...state,
                 status: STATUS.EMPTY,
             };
 
-        case actions.SET_LOADING_STATUS:
+        case action.SET_LOADING_STATUS:
             return {
                 ...state,
                 status: STATUS.LOADING,
             };
 
-        case actions.SET_LOADED_STATUS:
+        case action.SET_LOADED_STATUS:
             return {
                 ...state,
                 status: STATUS.LOADED,
             };
 
-        case actions.SET_ERROR_STATUS:
+        case action.SET_ERROR_STATUS:
             return {
                 ...state,
                 status: STATUS.ERROR,
-                error: actions.payload
+                error: action.payload
             };
 
         default:
