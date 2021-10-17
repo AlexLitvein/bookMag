@@ -1,15 +1,16 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga'
-import sensDataRdcr from '../rdcrs/weatherData/rdcr';
+// import sensDataRdcr from '../rdcrs/weatherData/rdcr';
 import statusRdcr from '../rdcrs/status/rdcr';
 import MyGraph from '../classes/Graph';
 import { setError, setLoaded, setLoading } from '../rdcrs/status/acts';
-import { setSensData, SET_SENS_DATA } from '../rdcrs/weatherData/acts';
+import { setSensData, GET_SENS_DATA } from '../rdcrs/weatherData/acts';
 import { remote_data } from './remoteData';
+import { pathRdcr } from '../svgDataRdcrs/paths';
 const { call, put, takeLatest, delay } = require('redux-saga/effects');
 
 const rootReducer = combineReducers({
-    sensData: sensDataRdcr,
+    paths: pathRdcr,
     status: statusRdcr
 });
 // const rootReducer = combineReducers({
@@ -54,23 +55,24 @@ function* fetchSensData(act) {
     try {
         yield put(setLoading());
         const o = yield call(splitObjDataToArr, remote_data[0]);
-        act.payload = yield call(MyGraph.buildPathObj, 0, 100, o.h);
+        // const data = yield call(MyGraph.buildPathObj, 0, 100, o.h);
+        const data = yield call(()=>{ return MyGraph.buildPathObj(0, 100, o.h)});
 
         // yield call(console.log, 'act.payload', act.payload);
        
-        yield put(setSensData(act));
+        yield put(setSensData(data));
         yield put(setLoaded());
     } catch (e) {
         yield put(setError(e.message));
     }
 };
 
-function* proc() {
+function* sagaWatcher() {
     console.log('proc');
-    yield takeLatest(SET_SENS_DATA, fetchSensData);
+    yield takeLatest(GET_SENS_DATA, fetchSensData);
 }
 
 
-sagaMiddleware.run(proc);
+sagaMiddleware.run(sagaWatcher);
 export default MyStore;
 

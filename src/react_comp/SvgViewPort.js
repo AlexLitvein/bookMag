@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import MyGraph from "../classes/Graph";
-import { setSensData } from "../rdcrs/weatherData/acts";
+import { getSensData } from "../rdcrs/weatherData/acts";
 import { selSensData } from "../rdcrs/weatherData/sels";
 import { Axis, Marker } from './Axis';
 
@@ -40,7 +40,7 @@ const SvgViewPort = () => {
         setH(height);
         MyGraph.resize(width, height);
 
-        dispatch(setSensData(0,0));
+        dispatch(getSensData(0, 0));
         //strPath = fillPath({ x: 0, y: 70 }, { w: 200, h: 200 }, 20, sd[0]);
         // ({ d, to } = strPath);
 
@@ -57,12 +57,18 @@ const SvgViewPort = () => {
 
     return (
         <svg id="graph" ref={domElm} width={w} height={h}>
+            {
+                sd.map((itm, idx) => (
+                    <>
+                        {/* <animate id="ani_p" begin="0s;indefinite" xlinkHref="#data_p" attributeName="d" dur="0.5" fill="freeze" to={itm.to} />
+                        <path id="data_p" class="path-data" d={itm.d}></path> */}
 
-            <animate id="ani_p" begin="0s;indefinite" xlinkHref="#data_p" attributeName="d" dur="0.5" fill="freeze" to={sd[0].to} />
-            <path id="data_p" class="path-data" d={sd[0].d}></path>
+                        <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${idx}`} attributeName="d" dur="0.5" fill="freeze" to={itm.to} />
+                        <path id={`data_${idx}`} class="path-data" d={itm.d}></path>
+                    </>
+                ))
+            }
 
-
-            {/* <HAxis x={rc.left} y={rc.bottom} w={200} h={6} /> */}
             <Marker id='mrkVHAxis' />
             <Axis id='x_axis' />
             <Axis id='y_axis' />

@@ -60,20 +60,26 @@ class Graph {
     }
 
     buildPathObj(min, max, data) {
-        console.log('buildPathObj',data);
-        const { w, h } = this.clientSize();
+        console.log('buildPathObj', data);
+        // const { w, h } = this.clientSize();
+        const rc = this.clientRect();
         let val = 0;
-        let lnSeg = w / data.length;
+        let lnSeg = (rc.right - rc.left) / data.length;
         let res = { d: 'M', to: 'M' };
 
         for (let i = 0; i < data.length; i++) {
-            val = data[i]['t'];
-            val = Math.round(((val - min) / (max - min)) * h);
-            res.d += `${this.cut(lnSeg * i)} ${this.cut(0)}L`;
-            res.to += `${this.cut(lnSeg * i)} ${this.cut(- val)}L`;
+            val = data[i];
+            val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
+            res.d += `${this.cut(rc.left + lnSeg * i)} ${this.cut(rc.bottom)}`;
+            res.to += `${this.cut(rc.left + lnSeg * i)} ${this.cut(rc.bottom - val)}`;
+
+            if (i < data.length - 1) {
+                res.d += 'L';
+                res.to += 'L';
+            }
         }
-        res.d[res.d.length - 1] = '';
-        res.to[res.to.length - 1] = '';
+        // res.d[res.d.length - 1] = '';
+        // res.to[res.to.length - 1] = '';
         // res.name = name;
         // res.cls = cls;
 
