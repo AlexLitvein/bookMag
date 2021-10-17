@@ -1,13 +1,13 @@
 // import { useDispatch } from "react-redux";
 
 
-class Graph {
+class ChartObject {
     constructor(w, h) {
         this.w = w;
         this.h = h;
-        this.axis = {};
-        this.dataSets = {};
-        this.markers = {};
+        // this.axis = {};
+        // this.dataSets = {};
+        // this.markers = {};
         // this.style; // ?
         this.padding = { top: 15, right: 10, bottom: 60, left: 34 };
         //this.scaleX=100;
@@ -108,33 +108,31 @@ class Graph {
     //     return res;
     // }
 
-    addMarker(id, w, h, refX, refY, cls) {
-        this.markers[id] = { w, h, refX, refY, cls };
-    }
+    // addMarker(id, w, h, refX, refY, cls) {
+    //     this.markers[id] = { w, h, refX, refY, cls };
+    // }
 
-    addAxle(id, name, type, cls) {
-        const rc = this.clientRect();
-        let p;
-        if (type === 'h') {
-            p = this.getOrthoPath(rc.left, rc.bottom, rc.right - rc.left, 1, type);
-        } else {
-            p = this.getOrthoPath(rc.left, rc.top, rc.bottom - rc.top, 1, type);
-        }
-        this.axis[id] = { name, type, cls, d: p };
-    }
+    // addAxle(id, name, type, cls) {
+    //     const rc = this.clientRect();
+    //     let p;
+    //     if (type === 'h') {
+    //         p = this.getOrthoPath(rc.left, rc.bottom, rc.right - rc.left, 1, type);
+    //     } else {
+    //         p = this.getOrthoPath(rc.left, rc.top, rc.bottom - rc.top, 1, type);
+    //     }
+    //     this.axis[id] = { name, type, cls, d: p };
+    // }
 
-    addDataSet(id, name, url, count, min, max) {
-        this.dataSets[id] = { name, url, count, min, max };
-    }
+    // addDataSet(id, name, url, count, min, max) {
+    //     this.dataSets[id] = { name, url, count, min, max };
+    // }
 
     addAxleUnitMeasure() {
-
     }
 
     fetchSensData() {
         // const dispatch = useDispatch();
         // dispatch(delChat(id));
-
     }
 
 
@@ -143,4 +141,4 @@ class Graph {
 
 }
 
-export default new Graph(320, 320);
+export default new ChartObject(320, 320);

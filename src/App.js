@@ -1,6 +1,6 @@
-import React, { useRef, useCallback, useEffect } from 'react';
-import SvgViewPort from './react_comp/SvgViewPort';
+import React, { useEffect } from 'react';
 import './App.css';
+import SvgChart from './react_comp/SvgChart';
 
 
 function App() {
@@ -20,11 +20,7 @@ function App() {
         <button id="btn_dec" type="button">-H</button>
       </div>
       <div className="wrpSvg">
-        <SvgViewPort >
-
-
-
-        </SvgViewPort>
+        <SvgChart />
       </div>
 
     </div>

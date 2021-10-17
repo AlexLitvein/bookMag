@@ -2,11 +2,12 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga'
 // import sensDataRdcr from '../rdcrs/weatherData/rdcr';
 import statusRdcr from '../rdcrs/status/rdcr';
-import MyGraph from '../classes/Graph';
+import MyGraph from '../classes/ChartObject';
 import { setError, setLoaded, setLoading } from '../rdcrs/status/acts';
-import { setSensData, GET_SENS_DATA } from '../rdcrs/weatherData/acts';
+// import { setSensData, GET_SENS_DATA } from '../rdcrs/weatherData/acts';
 import { remote_data } from './remoteData';
-import { pathRdcr } from '../svgDataRdcrs/paths';
+import { GET_SENS_DATA, pathRdcr, setAniPath, setPath } from '../svgDataRdcrs/paths';
+// import SvgHelpers from '../classes/svgHelpers';
 const { call, put, takeLatest, delay } = require('redux-saga/effects');
 
 const rootReducer = combineReducers({
@@ -60,7 +61,7 @@ function* fetchSensData(act) {
 
         // yield call(console.log, 'act.payload', act.payload);
        
-        yield put(setSensData(data));
+        yield put(setAniPath(-1, data));
         yield put(setLoaded());
     } catch (e) {
         yield put(setError(e.message));

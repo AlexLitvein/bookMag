@@ -1,1 +1,0 @@
-export const selSensData = (state) => state.graphData.sensData;

@@ -2,15 +2,13 @@ export const GET_SENS_DATA = 'GET_SENS_DATA';
 export const SET_ANI_PATH = 'SET_ANI_PATH';
 export const SET_PATH = 'SET_PATH';
 
-
-
 export function AniPath(id, cls, d, to) {
     return {
         ...arguments
     };
 }
 
-export function Path(id, cls, d) {
+export function StaticPath(id, cls, d) {
     return {
         ...arguments
     };
@@ -46,22 +44,30 @@ const initialState = {
     staticPaths: [], // Path
 };
 
-export const selAniPaths = (state) => state.graphData.aniPaths;
+export const selAniPaths = (state) => state.paths.aniPaths;
+export const selStaticPaths = (state) => state.paths.staticPaths;
 
 export function pathRdcr(state = initialState, action) {
+    console.log('pathRdcr',action);
+
     switch (action.type) {
-        case action.SET_ANI_PATH:
+        case SET_ANI_PATH: 
+            console.log('action.SET_ANI_PATH:', state.aniPaths);
+
             if (action.idx === -1) {
                 state.aniPaths.push();
             } else {
                 state.aniPaths[action.idx] = action.path;
-            }
+            }           
+
             return {
                 ...state,
                 aniPaths: [...state.aniPaths, action.path],
             };
+        
+            
 
-        case action.SET_PATH:
+        case SET_PATH:
             if (action.idx === -1) {
                 state.staticPaths.push();
             } else {

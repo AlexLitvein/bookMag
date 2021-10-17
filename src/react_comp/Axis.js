@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import MyGraph from "../classes/Graph";
+import MyGraph from "../classes/ChartObject";
 
 const Axis = ({ id }) => {    
     //console.log(`create Axis`);// ${x} ${y}
