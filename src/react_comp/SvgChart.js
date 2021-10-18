@@ -8,7 +8,7 @@ import { getSensData, selAniPaths, selStaticPaths } from "../svgDataRdcrs/paths"
 
 const SvgChart = () => {
     const [w, setW] = useState(0);
-    const [h, setH] = useState(0);  
+    const [h, setH] = useState(0);
     const svgElm = useRef(null);
     const dispatch = useDispatch();
 
@@ -16,29 +16,41 @@ const SvgChart = () => {
         return svgElm.current.parentElement.getBoundingClientRect();
     }
 
+    const resize = () => {
+        let { width, height } = getParentSize();
+        setW(width);
+        setH(height);
+        MyGraph.resize(width, height);
+
+
+    }
+
     const aniPaths = useSelector(selAniPaths);
 
     useEffect(() => {
         console.log('Chart useEffect');
 
-        dispatch(getSensData (0, 0));
-        
-        let { width, height } = getParentSize();
-        setW(width);
-        setH(height);        
+        resize();
+        // let { width, height } = getParentSize();
+        // setW(width);
+        // setH(height);
+        // MyGraph.resize(width, height);
+
+        dispatch(getSensData(0, 0, MyGraph.prepareSensData)); // after^^^
 
         window.addEventListener('resize', (e) => {
-            let { width, height } = getParentSize();
-            setW(width);
-            setH(height);
-            MyGraph.resize(width, height);
+            resize();
+            // let { width, height } = getParentSize();
+            // setW(width);
+            // setH(height);
+            // MyGraph.resize(width, height);
         });
     }, []); // componentDidMount()
 
     return (
         <svg id="graph" ref={svgElm} width={w} height={h}>
-            { console.log('staticPaths', aniPaths)}
-            
+            {console.log('draw SvgChart')}
+
             {
                 aniPaths.map((itm, idx) => (
                     <>
@@ -50,7 +62,7 @@ const SvgChart = () => {
                     </>
                 ))
             }
-           
+
 
         </svg>
 

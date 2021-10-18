@@ -59,8 +59,9 @@ class ChartObject {
         return d;
     }
 
-    buildPathObj(min, max, data) {
-        console.log('buildPathObj', data);
+    // data = [num1 , num2 , num3 , ...]
+    buildSvgAniPath(min, max, data) {
+        // console.log('buildPathObj', data);
         // const { w, h } = this.clientSize();
         const rc = this.clientRect();
         let val = 0;
@@ -84,6 +85,51 @@ class ChartObject {
         // res.cls = cls;
 
         return res;
+    }
+
+
+
+    // входные данные массив объектов, например: 
+    // [
+    //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+    //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+    //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+    // ]
+    // то
+    // функция возвращает объект со свойствами массивами
+    // { 
+    //      d: ['2021-11-05', ...], 
+    //      t: [21.2, ...],
+    //      p: [36.9 ...],
+    //      h: [12.5 ...]
+    // }
+    convertArrObjectsToArrProperties(arrObjects) {
+        const out = {};
+        if (arrObjects.length !== 0) {
+            let o = arrObjects[0];
+            for (const key in o) {
+                out[key] = [];
+            }
+
+            arrObjects.forEach(el => {
+                for (const key in el) {
+                    out[key].push(el[key]);
+                }
+            });
+        }
+        return out;
+    }
+
+
+    prepareSensData = (data) => {
+        console.log('prepareSensData', data);
+
+        const out = [];
+        const d1 = this.convertArrObjectsToArrProperties(data);
+        out.push(this.buildSvgAniPath(-50, 50, d1.t));
+        out.push(this.buildSvgAniPath(0, 1000, d1.p));
+        out.push(this.buildSvgAniPath(0, 100, d1.h));
+        return out;
     }
 
     // buildPath(pos, size, lnSeg, data) {

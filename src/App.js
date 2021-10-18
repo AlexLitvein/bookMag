@@ -2,11 +2,15 @@ import React, { useEffect } from 'react';
 import './App.css';
 import SvgChart from './react_comp/SvgChart';
 
-
+// TODO: перенести статус загрузки в pathRdcr
 function App() {
   useEffect(() => {
     document.getElementById('btnstart').addEventListener('click', (e) => {
-      document.getElementById('ani_p').beginElement();
+      // document.getElementById('ani_p').beginElement();
+      const els = document.getElementsByTagName('animate'); // 
+      for (let i = 0; i < els.length; i++) {
+        els[i].beginElement();
+      }
     });
 
   }, []); // componentDidMount()
