@@ -31,19 +31,10 @@ const SvgChart = () => {
         console.log('Chart useEffect');
 
         resize();
-        // let { width, height } = getParentSize();
-        // setW(width);
-        // setH(height);
-        // MyGraph.resize(width, height);
-
         dispatch(getSensData(0, 0, MyGraph.prepareSensData)); // after^^^
-
+        
         window.addEventListener('resize', (e) => {
             resize();
-            // let { width, height } = getParentSize();
-            // setW(width);
-            // setH(height);
-            // MyGraph.resize(width, height);
         });
     }, []); // componentDidMount()
 

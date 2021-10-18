@@ -103,34 +103,76 @@ class ChartObject {
     //      p: [36.9 ...],
     //      h: [12.5 ...]
     // }
+    // convertArrObjectsToArrProperties(arrObjects) {
+    //     const out = {};
+    //     if (arrObjects.length !== 0) {
+    //         let o = arrObjects[0];
+    //         for (const key in o) {
+    //             out[key] = [];
+    //         }
+
+    //         arrObjects.forEach(el => {
+    //             for (const key in el) {
+    //                 out[key].push(el[key]);
+    //             }
+    //         });
+    //     }
+    //     return out;
+    // }
+
+    // =============================================
+    // return
+    //     {
+    //         d: { rawData: ['2021-11-05', ...] },
+    //         t: { rawData: [21.2, ...] },
+    //         p: { rawData: [36.9 ...] },
+    //         h: { rawData: [12.5 ...] },
+    //     },
     convertArrObjectsToArrProperties(arrObjects) {
         const out = {};
         if (arrObjects.length !== 0) {
             let o = arrObjects[0];
             for (const key in o) {
-                out[key] = [];
+                out[key] = { rawData: [] };
             }
 
             arrObjects.forEach(el => {
                 for (const key in el) {
-                    out[key].push(el[key]);
+                    out[key].rawData.push(el[key]);
                 }
             });
         }
         return out;
     }
-
-
+    
+    // =============================================
+    // return
+    //     {
+    //         d: { rawData: ['2021-11-05', ...], pathD: '', pathTo: '' },
+    //         t: { rawData: [21.2, ...], pathD: '', pathTo: '' },
+    //         p: { rawData: [36.9 ...], pathD: '', pathTo: '' },
+    //         h: { rawData: [12.5 ...], pathD: '', pathTo: '' },
+    //     }
     prepareSensData = (data) => {
         console.log('prepareSensData', data);
 
-        const out = [];
-        const d1 = this.convertArrObjectsToArrProperties(data);
-        out.push(this.buildSvgAniPath(-50, 50, d1.t));
-        out.push(this.buildSvgAniPath(0, 1000, d1.p));
-        out.push(this.buildSvgAniPath(0, 100, d1.h));
+        const out = this.convertArrObjectsToArrProperties(data);
+        out.t = { ...this.buildSvgAniPath(-50, 50, out.t.rawData) };
+        out.p = { ...this.buildSvgAniPath(0, 1000, out.p.rawData) };
+        out.h = { ...this.buildSvgAniPath(0, 100, out.h.rawData) };
         return out;
     }
+
+    // prepareSensData = (data) => {
+    //     console.log('prepareSensData', data);
+
+    //     const out = [];
+    //     const d1 = this.convertArrObjectsToArrProperties(data);
+    //     out.push(this.buildSvgAniPath(-50, 50, d1.t));
+    //     out.push(this.buildSvgAniPath(0, 1000, d1.p));
+    //     out.push(this.buildSvgAniPath(0, 100, d1.h));
+    //     return out;
+    // }
 
     // buildPath(pos, size, lnSeg, data) {
     //     // console.log('fillPath');

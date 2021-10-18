@@ -40,6 +40,33 @@ export const getSensData = (date, count, func) => {
     }
 };
 
+
+
+// набор данных: 
+// [
+//     {
+//         d: { rawData: ['2021-11-05', ...], pathD: '', pathTo: '' },
+//         t: { rawData: [21.2, ...], pathD: '', pathTo: '' },
+//         p: { rawData: [36.9 ...], pathD: '', pathTo: '' },
+//         h: { rawData: [12.5 ...], pathD: '', pathTo: '' },
+//     },
+// ]
+
+// other variant
+// [
+//     {
+//         '2021-11-05+7': { // key 
+//             d: { rawData: ['2021-11-05', ...], pathD: '', pathTo: ''},
+//             t: { rawData: [21.2, ...], pathD: '', pathTo: ''},
+//             p: { rawData: [36.9 ...], pathD: '', pathTo: ''},
+//             h: { rawData: [12.5 ...], pathD: '', pathTo: ''},
+//         }
+//     },
+
+// ]
+
+
+
 const initialState = {
     aniPaths: [], // AniPath
     staticPaths: [], // Path
