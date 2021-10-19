@@ -31,8 +31,8 @@ const SvgChart = () => {
         console.log('Chart useEffect');
 
         resize();
-        dispatch(getSensData(0, 0, MyGraph.prepareSensData)); // after^^^
-        
+        dispatch(getSensData({ date: 0, count: 0, func: MyGraph.prepareSensData })); // after^^^
+
         window.addEventListener('resize', (e) => {
             resize();
         });

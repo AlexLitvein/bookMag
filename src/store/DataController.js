@@ -21,10 +21,11 @@ function* fetchSensData(act) { // act = { date, count, func }
     yield put(setLoading());
     const receivedData = yield remote_data[0];
 
-    const data = yield call(act.func, receivedData);
-    for (let i = 0; i < data.length; i++) {
-        yield put(setAniPath(data[i]));
-    }
+    const pathData = yield call(act.payload.func, receivedData);
+    yield put(setAniPath({ pathData }));
+    // for (let i = 0; i < data.length; i++) {
+    //     yield put(setAniPath(data[i]));
+    // }
 
     yield put(setLoaded());
     // } catch (e) {

@@ -88,12 +88,12 @@ class ChartObject {
     }
 
 
-
+    // =============================================
     // входные данные массив объектов, например: 
     // [
-    //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
-    //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
-    //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+    //      { _id: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+    //      { _id: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+    //      { _id: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
     // ]
     // то
     // функция возвращает объект со свойствами массивами
@@ -103,48 +103,74 @@ class ChartObject {
     //      p: [36.9 ...],
     //      h: [12.5 ...]
     // }
-    // convertArrObjectsToArrProperties(arrObjects) {
-    //     const out = {};
-    //     if (arrObjects.length !== 0) {
-    //         let o = arrObjects[0];
-    //         for (const key in o) {
-    //             out[key] = [];
-    //         }
-
-    //         arrObjects.forEach(el => {
-    //             for (const key in el) {
-    //                 out[key].push(el[key]);
-    //             }
-    //         });
-    //     }
-    //     return out;
-    // }
-
-    // =============================================
-    // return
-    //     {
-    //         d: { rawData: ['2021-11-05', ...] },
-    //         t: { rawData: [21.2, ...] },
-    //         p: { rawData: [36.9 ...] },
-    //         h: { rawData: [12.5 ...] },
-    //     },
     convertArrObjectsToArrProperties(arrObjects) {
         const out = {};
         if (arrObjects.length !== 0) {
             let o = arrObjects[0];
             for (const key in o) {
-                out[key] = { rawData: [] };
+                out[key] = [];
             }
 
             arrObjects.forEach(el => {
                 for (const key in el) {
-                    out[key].rawData.push(el[key]);
+                    out[key].push(el[key]);
                 }
             });
         }
         return out;
     }
-    
+
+    // =============================================
+    // return
+    // out = [
+    //         { d: ['2021-11-05', ...], },
+    //         { t: [21.2, ...], },
+    //         { p: [36.9 ...], },
+    //         { h: [12.5 ...], },
+    //     ],
+    // ]
+    // convertArrObjectsToArrProperties(arrObjects) {
+    //     const out = [];
+    //     const tmp = {};
+    //     if (arrObjects.length !== 0) {
+    //         let o = arrObjects[0];
+    //         for (const key in o) {
+    //             tmp[key] = [];
+    //         }
+    //         // after^^^
+    //         // tmp = { d: [],  t: [],  p: [], h: [], }
+
+    //         arrObjects.forEach(el => {
+    //             for (const key in el) {
+    //                 tmp[key].push(el[key]);
+    //             }
+    //         });
+    //         // after^^^
+    //         // tmp = {
+    //         //         d: ['2021-11-05', ...],
+    //         //         t: [21.2, ...],
+    //         //         p: [36.9 ...],
+    //         //         h: [12.5 ...],
+    //         //     },
+
+    //         for (const k in tmp) {
+    //             out.push({ [k]: tmp[k] });
+    //         }
+    //     }
+    //     return out;
+
+
+    // prepareSensData = (data) => {
+    //     console.log('prepareSensData', data);
+
+    //     const out = this.convertArrObjectsToArrProperties(data);
+    //     out[0] = { pathD: '', pathTo: '' };
+    //     out[1] = { ...this.buildSvgAniPath(-50, 50, out[1].t) };
+    //     out[2] = { ...this.buildSvgAniPath(0, 1000, out[2].p) };
+    //     out[3] = { ...this.buildSvgAniPath(0, 100, out[3].h) };
+    //     return out;
+    // }
+
     // =============================================
     // return
     //     {
@@ -153,13 +179,35 @@ class ChartObject {
     //         p: { rawData: [36.9 ...], pathD: '', pathTo: '' },
     //         h: { rawData: [12.5 ...], pathD: '', pathTo: '' },
     //     }
+
+    // =============================================
+    // return
+    //     [
+    //         { d: ['2021-11-05', ...], pathD: '', pathTo: '' },
+    //         { t: [21.2, ...], pathD: '', pathTo: '' },
+    //         { p: [36.9 ...], pathD: '', pathTo: '' },
+    //         { h: [12.5 ...], pathD: '', pathTo: '' },
+    //     ],
     prepareSensData = (data) => {
         console.log('prepareSensData', data);
 
-        const out = this.convertArrObjectsToArrProperties(data);
-        out.t = { ...this.buildSvgAniPath(-50, 50, out.t.rawData) };
-        out.p = { ...this.buildSvgAniPath(0, 1000, out.p.rawData) };
-        out.h = { ...this.buildSvgAniPath(0, 100, out.h.rawData) };
+        const out = [];
+        const obj = this.convertArrObjectsToArrProperties(data);
+        // out.d = { ...out.d, pathD: '', pathTo: '' };
+        // out.t = { ...out.t, ...this.buildSvgAniPath(-50, 50, out.t) };
+        // out.p = { ...out.p, ...this.buildSvgAniPath(0, 1000, out.p) };
+        // out.h = { ...out.h, ...this.buildSvgAniPath(0, 100, out.h) };
+
+        // for (const key in obj) {
+        //     out.push({ [key]: obj[key], ...this.buildSvgAniPath(-50, 50, out.t) });
+        // }
+        console.log('obj', obj);
+
+        out.push({ date: obj._id, d: '', to: '' });
+        out.push({ t: obj.t, ...this.buildSvgAniPath(-50, 50, obj.t) });
+        out.push({ p: obj.p, ...this.buildSvgAniPath(0, 1000, obj.p) });
+        out.push({ h: obj.h, ...this.buildSvgAniPath(0, 100, obj.h) });
+
         return out;
     }
 

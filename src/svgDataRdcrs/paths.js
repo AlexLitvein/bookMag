@@ -15,28 +15,28 @@ export function StaticPath(id, cls, d) {
     };
 }
 
-export const setAniPath = (path) => {// path as AniPath // if idx = -1 add new
+export const setAniPath = (payload) => {
     return {
         type: SET_ANI_PATH,
-        path,
+        payload,
     }
 };
 
-export const setPath = (idx, path) => {// path as Path // if idx = -1 add new
+export const setPath = (payload) => {
     return {
         type: SET_PATH,
-        idx,
-        path,
+        payload,
     }
 };
 
-export const getSensData = (date, count, func) => {
+export const getSensData = (payload,) => { // date, count, func
     console.log('act getSensData');
     return {
         type: GET_SENS_DATA,
-        date: date,
-        count: count,
-        func: func,
+        payload,
+        // date: date,
+        // count: count,
+        // func: func,
     }
 };
 
@@ -50,6 +50,16 @@ export const getSensData = (date, count, func) => {
 //         p: { rawData: [36.9 ...], pathD: '', pathTo: '' },
 //         h: { rawData: [12.5 ...], pathD: '', pathTo: '' },
 //     },
+// ]
+
+// other variant CURRENT
+// [
+//     [
+//         { d: ['2021-11-05', ...], pathD: '', pathTo: '' },
+//         { t: [21.2, ...], pathD: '', pathTo: '' },
+//         { p: [36.9 ...], pathD: '', pathTo: '' },
+//         { h: [12.5 ...], pathD: '', pathTo: '' },
+//     ],
 // ]
 
 // other variant
@@ -84,7 +94,7 @@ export function pathRdcr(state = initialState, action) {
             state.aniPaths.push();
             return {
                 ...state,
-                aniPaths: [...state.aniPaths, action.path],
+                aniPaths: [...state.aniPaths, action.payload.pathData],
             };
 
 
@@ -93,7 +103,7 @@ export function pathRdcr(state = initialState, action) {
             state.staticPaths.push();
             return {
                 ...state,
-                staticPaths: [...state.staticPaths, action.path],
+                staticPaths: [...state.staticPaths, action.payload.pathData],
             };
 
         default:
