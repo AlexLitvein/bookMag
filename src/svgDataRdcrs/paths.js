@@ -1,7 +1,9 @@
+import MyGraph from "../classes/ChartObject";
+
 export const GET_SENS_DATA = 'GET_SENS_DATA';
 export const SET_ANI_PATH = 'SET_ANI_PATH';
 export const SET_PATH = 'SET_PATH';
-export const DO_RESIZE = 'DO_RESIZE';
+export const SET_RESIZE_PATHS = 'SET_RESIZE_PATHS';
 
 export function AniPath(id, cls, d, to) {
     return {
@@ -29,6 +31,12 @@ export const setPath = (payload) => {
     }
 };
 
+export const setResizePaths = () => {
+    return {
+        type: SET_RESIZE_PATHS,
+    }
+};
+
 export const getSensData = (payload,) => { // date, count, func
     console.log('act getSensData');
     return {
@@ -50,10 +58,10 @@ export const getSensData = (payload,) => { // date, count, func
 // other variant CURRENT
 // [
 //     [
-//         { d: ['2021-11-05', ...], pathD: '', pathTo: '' },
-//         { t: [21.2, ...], pathD: '', pathTo: '' },
-//         { p: [36.9 ...], pathD: '', pathTo: '' },
-//         { h: [12.5 ...], pathD: '', pathTo: '' },
+//         { d: ['2021-11-05', ...], do: '', to: '' },
+//         { t: [21.2, ...], do: '', to: '' },
+//         { p: [36.9 ...], do: '', to: '' },
+//         { h: [12.5 ...], do: '', to: '' },
 //     ],
 // ]
 
@@ -73,6 +81,7 @@ export const getSensData = (payload,) => { // date, count, func
 const initialState = {
     aniPaths: [],
     staticPaths: [],
+    // axis: {},
 };
 
 export const selAniPaths = (state) => state.paths.aniPaths;
@@ -87,20 +96,23 @@ export function pathRdcr(state = initialState, action) {
             state.aniPaths.push();
             return {
                 ...state,
-                aniPaths: [...state.aniPaths, ...action.payload.pathData],
+                aniPaths: [...state.aniPaths, action.payload.pathData],
             };
 
-        case DO_RESIZE:
-
+        case SET_RESIZE_PATHS:
+            const res = [];
+            state.aniPaths.forEach((el) => { res.push(MyGraph.resizePaths(el)) });
+            // console.log('res', res);
             return {
                 ...state,
+                aniPaths: [...res],
             };
 
         case SET_PATH:
             state.staticPaths.push();
             return {
                 ...state,
-                staticPaths: [...state.staticPaths, ...action.payload.pathData],
+                staticPaths: [...state.staticPaths, action.payload.pathData],
             };
 
         default:

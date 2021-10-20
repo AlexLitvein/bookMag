@@ -5,7 +5,7 @@ class ChartObject {
     constructor(w, h) {
         this.w = w;
         this.h = h;
-        // this.axis = {};
+        this.axis = {};
         // this.dataSets = {};
         // this.markers = {};
         // this.style; // ?
@@ -15,8 +15,20 @@ class ChartObject {
         this.cut = function (n) {
             return Math.floor(n) + 0.5;
         }
+
+        this._resizeAxle = function (type) {
+            const rc = this.clientRect();
+            return this.getOrthoPath(rc.left, type === 'h' ? rc.bottom : rc.top, type === 'h' ? (rc.right - rc.left) : (rc.bottom - rc.top), 1, type);
+        }
+
+        this.addAxle('d', 'Дата', 0, 0, 'h', 'path-data');
+        this.addAxle('t', 'Temperature', -50, 50, 'v', 'path-data');
+        this.addAxle('p', 'Давление', 0, 1000, 'v', 'path-data');
+        this.addAxle('h', 'Влажность', 0, 100, 'v', 'path-data');
+
     }
 
+    getAxis() { return this.axis; }
     // width() { return this.w; }
     // height() { return this.h; }
 
@@ -45,8 +57,10 @@ class ChartObject {
     }
 
     resize(w, h) {
+        console.log('resize', { w, h });
         this.w = w;
         this.h = h;
+        this.resizeAxis();
     }
 
     getOrthoPath(x, y, size, numSeg, type) {
@@ -66,16 +80,16 @@ class ChartObject {
         const rc = this.clientRect();
         let val = 0;
         let lnSeg = (rc.right - rc.left) / data.length;
-        let res = { d: 'M', to: 'M' };
+        let res = { do: 'M', to: 'M' };
 
         for (let i = 0; i < data.length; i++) {
             val = data[i];
             val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
-            res.d += `${this.cut(rc.left + lnSeg * i)} ${this.cut(rc.bottom)}`;
+            res.do += `${this.cut(rc.left + lnSeg * i)} ${this.cut(rc.bottom)}`;
             res.to += `${this.cut(rc.left + lnSeg * i)} ${this.cut(rc.bottom - val)}`;
 
             if (i < data.length - 1) {
-                res.d += 'L';
+                res.do += 'L';
                 res.to += 'L';
             }
         }
@@ -189,27 +203,23 @@ class ChartObject {
     //         { h: [12.5 ...], pathD: '', pathTo: '' },
     //     ],
     prepareSensData = (data) => {
-        console.log('prepareSensData', data);
-
+        // console.log('prepareSensData', data);
         const out = [];
         const obj = this.convertArrObjectsToArrProperties(data);
-        // out.d = { ...out.d, pathD: '', pathTo: '' };
-        // out.t = { ...out.t, ...this.buildSvgAniPath(-50, 50, out.t) };
-        // out.p = { ...out.p, ...this.buildSvgAniPath(0, 1000, out.p) };
-        // out.h = { ...out.h, ...this.buildSvgAniPath(0, 100, out.h) };
-
-        // for (const key in obj) {
-        //     out.push({ [key]: obj[key], ...this.buildSvgAniPath(-50, 50, out.t) });
-        // }
-        console.log('obj', obj);
-
-        out.push({ date: obj._id, d: '', to: '' });
+        out.push({ d: obj._id, do: '', to: '' });
         out.push({ t: obj.t, ...this.buildSvgAniPath(-50, 50, obj.t) });
         out.push({ p: obj.p, ...this.buildSvgAniPath(0, 1000, obj.p) });
         out.push({ h: obj.h, ...this.buildSvgAniPath(0, 100, obj.h) });
 
         return out;
     }
+
+    // resizePaths = (arr) => {
+    //     arr.forEach((el => {
+    //         el = { ...this.buildSvgAniPath(-50, 50, el.t) }
+    //     }));
+
+    // }
 
     // prepareSensData = (data) => {
     //     console.log('prepareSensData', data);
@@ -248,16 +258,36 @@ class ChartObject {
     //     this.markers[id] = { w, h, refX, refY, cls };
     // }
 
-    // addAxle(id, name, type, cls) {
-    //     const rc = this.clientRect();
-    //     let p;
-    //     if (type === 'h') {
-    //         p = this.getOrthoPath(rc.left, rc.bottom, rc.right - rc.left, 1, type);
-    //     } else {
-    //         p = this.getOrthoPath(rc.left, rc.top, rc.bottom - rc.top, 1, type);
-    //     }
-    //     this.axis[id] = { name, type, cls, d: p };
-    // }
+    addAxle(id, name, min, max, type, cls) {
+        this.axis[id] = {
+            name, min, max, type, cls,
+            path: this._resizeAxle(type) // , nSeg?
+        };
+    }
+
+    resizeAxis() {
+        for (const key in this.axis) {
+            const el = this.axis[key];
+            el.path = this._resizeAxle(el.type);
+        }
+    }
+
+    resizePaths = (paths) => {
+        // console.log('paths', paths);
+        return paths.map((el) => {
+            return this.resizePath(el);
+        });
+    }
+
+    resizePath = (path) => {
+        // console.log('path', path);
+        const propName1 = Object.keys(path)[0];
+        // console.log('propName1', propName1);
+        const res = { ...path, ...this.buildSvgAniPath(this.axis[propName1].min, this.axis[propName1].max, path[propName1]) };
+
+        // console.log('resizePath', res);
+        return res;
+    }
 
     // addDataSet(id, name, url, count, min, max) {
     //     this.dataSets[id] = { name, url, count, min, max };
