@@ -34,13 +34,8 @@ export const getSensData = (payload,) => { // date, count, func
     return {
         type: GET_SENS_DATA,
         payload,
-        // date: date,
-        // count: count,
-        // func: func,
     }
 };
-
-
 
 // набор данных: 
 // [
@@ -75,11 +70,9 @@ export const getSensData = (payload,) => { // date, count, func
 
 // ]
 
-
-
 const initialState = {
-    aniPaths: [], // AniPath
-    staticPaths: [], // Path
+    aniPaths: [],
+    staticPaths: [],
 };
 
 export const selAniPaths = (state) => state.paths.aniPaths;
@@ -94,16 +87,20 @@ export function pathRdcr(state = initialState, action) {
             state.aniPaths.push();
             return {
                 ...state,
-                aniPaths: [...state.aniPaths, action.payload.pathData],
+                aniPaths: [...state.aniPaths, ...action.payload.pathData],
             };
 
+        case DO_RESIZE:
 
+            return {
+                ...state,
+            };
 
         case SET_PATH:
             state.staticPaths.push();
             return {
                 ...state,
-                staticPaths: [...state.staticPaths, action.payload.pathData],
+                staticPaths: [...state.staticPaths, ...action.payload.pathData],
             };
 
         default:
