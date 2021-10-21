@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
-import MyGraph from './classes/ChartObject';
-import SvgChart from './react_comp/NewSvgChart';
-import { getSensData, selAniPaths } from './svgDataRdcrs/paths';
+import SvgChart from './react_comp/SvgChart';
+import { getSensData, selAniPaths } from './dataRdcrs/paths';
 
 const axis = {
-  d: { name: 'Дата', min: 0, max: 0, type: 'h', cls: 'axis' },
+  _id: { name: 'Дата', min: 0, max: 0, type: 'h', cls: 'axis' },
   t: { name: 'Temperature', min: -50, max: 50, type: 'v', cls: 'axis' },
   p: { name: 'Давление', min: 0, max: 1000, type: 'v', cls: 'axis' },
   h: { name: 'Влажность', min: 0, max: 100, type: 'v', cls: 'axis' },
@@ -19,17 +18,29 @@ const options = {
 // TODO: перенести статус загрузки в pathRdcr
 function App() {
   const dispatch = useDispatch();
-
   const aniPaths = useSelector(selAniPaths);
 
+  const convertArrObjectsToObjectPropertyArrays = (arrObjects) => {
+    const out = {};
+    if (arrObjects.length !== 0) {
+      let o = arrObjects[0];
+      for (const key in o) {
+        out[key] = [];
+      }
+
+      arrObjects.forEach(el => {
+        for (const key in el) {
+          out[key].push(el[key]);
+        }
+      });
+    }
+    return out;
+  }
+
   useEffect(() => {
-
-    dispatch(getSensData({ date: 0, count: 0, func: MyGraph.prepareSensData }));
-
-
+    dispatch(getSensData({ date: 0, count: 0, func: convertArrObjectsToObjectPropertyArrays }));
 
     document.getElementById('btnstart').addEventListener('click', (e) => {
-      // document.getElementById('ani_p').beginElement();
       const els = document.getElementsByTagName('animate'); // 
       for (let i = 0; i < els.length; i++) {
         els[i].beginElement();

@@ -1,22 +1,10 @@
-import MyGraph from "../classes/ChartObject";
+// import MyGraph from "../classes/ChartObject";
 
 export const GET_SENS_DATA = 'GET_SENS_DATA';
 export const SET_ANI_PATH = 'SET_ANI_PATH';
-export const SET_PATH = 'SET_PATH';
-export const SET_RESIZE_PATHS = 'SET_RESIZE_PATHS';
+// export const SET_PATH = 'SET_PATH';
+// export const SET_RESIZE_PATHS = 'SET_RESIZE_PATHS';
 export const SET_TEXT = 'SET_TEXT';
-
-export function AniPath(id, cls, d, to) {
-    return {
-        ...arguments
-    };
-}
-
-export function StaticPath(id, cls, d) {
-    return {
-        ...arguments
-    };
-}
 
 export const setText = (payload) => {
     return {
@@ -32,18 +20,18 @@ export const setAniPath = (payload) => {
     }
 };
 
-export const setPath = (payload) => {
-    return {
-        type: SET_PATH,
-        payload,
-    }
-};
+// export const setPath = (payload) => {
+//     return {
+//         type: SET_PATH,
+//         payload,
+//     }
+// };
 
-export const setResizePaths = () => {
-    return {
-        type: SET_RESIZE_PATHS,
-    }
-};
+// export const setResizePaths = () => {
+//     return {
+//         type: SET_RESIZE_PATHS,
+//     }
+// };
 
 export const getSensData = (payload,) => { // date, count, func
     console.log('act getSensData');
@@ -55,23 +43,24 @@ export const getSensData = (payload,) => { // date, count, func
 
 // набор данных: 
 // [
-//     [
-//         { d: ['2021-11-05', ...], do: '', to: '' },
-//         { t: [21.2, ...], do: '', to: '' },
-//         { p: [36.9 ...], do: '', to: '' },
-//         { h: [12.5 ...], do: '', to: '' },
-//     ],
+//      { 
+//           _id: ['2021-11-05', ...], 
+//           t:   [21.2, ...],
+//           p:   [36.9 ...],
+//           h:   [12.5 ...]
+//      },
+//      ...
 // ]
 const initialState = {
     aniPaths: [],
-    staticPaths: [],
+    // staticPaths: [],
     // axis: {},
     text: { t1: 'text1', t2: 'text2' },
     // text: ['text1', 'text2'],
 };
 
 export const selAniPaths = (state) => state.paths.aniPaths;
-export const selStaticPaths = (state) => state.paths.staticPaths;
+// export const selStaticPaths = (state) => state.paths.staticPaths;
 export const selText = (state) => state.paths.text;
 
 export function pathRdcr(state = initialState, action) {
@@ -93,21 +82,21 @@ export function pathRdcr(state = initialState, action) {
                 aniPaths: [...state.aniPaths, action.payload.pathData],
             };
 
-        case SET_RESIZE_PATHS:
-            const res = [];
-            state.aniPaths.forEach((el) => { res.push(MyGraph.resizePaths(el)) });
-            // console.log('res', res);
-            return {
-                ...state,
-                aniPaths: [...res],
-            };
+        // case SET_RESIZE_PATHS:
+        //     const res = [];
+        //     state.aniPaths.forEach((el) => { res.push(MyGraph.resizePaths(el)) });
+        //     // console.log('res', res);
+        //     return {
+        //         ...state,
+        //         aniPaths: [...res],
+        //     };
 
-        case SET_PATH:
-            state.staticPaths.push();
-            return {
-                ...state,
-                staticPaths: [...state.staticPaths, action.payload.pathData],
-            };
+        // case SET_PATH:
+        //     state.staticPaths.push();
+        //     return {
+        //         ...state,
+        //         staticPaths: [...state.staticPaths, action.payload.pathData],
+        //     };
 
         default:
             return state;
