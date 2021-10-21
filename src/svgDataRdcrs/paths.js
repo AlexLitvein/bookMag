@@ -4,6 +4,7 @@ export const GET_SENS_DATA = 'GET_SENS_DATA';
 export const SET_ANI_PATH = 'SET_ANI_PATH';
 export const SET_PATH = 'SET_PATH';
 export const SET_RESIZE_PATHS = 'SET_RESIZE_PATHS';
+export const SET_TEXT = 'SET_TEXT';
 
 export function AniPath(id, cls, d, to) {
     return {
@@ -16,6 +17,13 @@ export function StaticPath(id, cls, d) {
         ...arguments
     };
 }
+
+export const setText = (payload) => {
+    return {
+        type: SET_TEXT,
+        payload,
+    }
+};
 
 export const setAniPath = (payload) => {
     return {
@@ -47,16 +55,6 @@ export const getSensData = (payload,) => { // date, count, func
 
 // набор данных: 
 // [
-//     {
-//         d: { rawData: ['2021-11-05', ...], pathD: '', pathTo: '' },
-//         t: { rawData: [21.2, ...], pathD: '', pathTo: '' },
-//         p: { rawData: [36.9 ...], pathD: '', pathTo: '' },
-//         h: { rawData: [12.5 ...], pathD: '', pathTo: '' },
-//     },
-// ]
-
-// other variant CURRENT
-// [
 //     [
 //         { d: ['2021-11-05', ...], do: '', to: '' },
 //         { t: [21.2, ...], do: '', to: '' },
@@ -64,36 +62,32 @@ export const getSensData = (payload,) => { // date, count, func
 //         { h: [12.5 ...], do: '', to: '' },
 //     ],
 // ]
-
-// other variant
-// [
-//     {
-//         '2021-11-05+7': { // key 
-//             d: { rawData: ['2021-11-05', ...], pathD: '', pathTo: ''},
-//             t: { rawData: [21.2, ...], pathD: '', pathTo: ''},
-//             p: { rawData: [36.9 ...], pathD: '', pathTo: ''},
-//             h: { rawData: [12.5 ...], pathD: '', pathTo: ''},
-//         }
-//     },
-
-// ]
-
 const initialState = {
     aniPaths: [],
     staticPaths: [],
     // axis: {},
+    text: { t1: 'text1', t2: 'text2' },
+    // text: ['text1', 'text2'],
 };
 
 export const selAniPaths = (state) => state.paths.aniPaths;
 export const selStaticPaths = (state) => state.paths.staticPaths;
+export const selText = (state) => state.paths.text;
 
 export function pathRdcr(state = initialState, action) {
     console.log('pathRdcr', action);
 
     switch (action.type) {
+        case SET_TEXT:
+            // console.log('action.SET_ANI_PATH:', state.aniPaths);            
+            return {
+                ...state,
+                text: { ...action.payload },
+                // text: { ...state.text, ...action.payload },
+            };
+
         case SET_ANI_PATH:
-            // console.log('action.SET_ANI_PATH:', state.aniPaths);
-            state.aniPaths.push();
+            // console.log('action.SET_ANI_PATH:', state.aniPaths);           
             return {
                 ...state,
                 aniPaths: [...state.aniPaths, action.payload.pathData],

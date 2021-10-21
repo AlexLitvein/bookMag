@@ -6,6 +6,7 @@ class ChartObject {
         this.w = w;
         this.h = h;
         this.axis = {};
+        // this.aniPaths = [];
         // this.dataSets = {};
         // this.markers = {};
         // this.style; // ?
@@ -27,6 +28,8 @@ class ChartObject {
         this.addAxle('h', 'Влажность', 0, 100, 'v', 'path-data');
 
     }
+
+    getAniPaths() { return this.aniPaths; }
 
     getAxis() { return this.axis; }
     // width() { return this.w; }

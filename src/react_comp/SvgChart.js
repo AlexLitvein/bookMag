@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import MyGraph from "../classes/ChartObject";
 // import { getSensData } from "../rdcrs/weatherData/acts";
 // import { selSensData } from "../rdcrs/weatherData/sels";
-import { getSensData, selAniPaths, selStaticPaths, setResizePaths } from "../svgDataRdcrs/paths";
+import { getSensData, selAniPaths, selStaticPaths, selText, setResizePaths, setText } from "../svgDataRdcrs/paths";
+import { TextSvg } from "./Axis";
 // import { Axis, Marker } from './Axis';
 
 const SvgChart = () => {
@@ -32,11 +33,16 @@ const SvgChart = () => {
         ));
     }
 
+    const txt = useSelector(selText);
     const aniPaths = useSelector(selAniPaths);
+
     const axis = MyGraph.getAxis();
 
     useEffect(() => {
         console.log('Chart useEffect');
+        // setTimeout(() => {
+        //     dispatch(setText({ t2: 'newText2' }));
+        // }, 2000);
 
         resize();
         dispatch(getSensData({ date: 0, count: 0, func: MyGraph.prepareSensData })); // after^^^
@@ -67,7 +73,21 @@ const SvgChart = () => {
                 })
             }
 
+            {
+                function () {
+                    let arr = [];
+                    let posy = 0;
+                    for (const k in txt) {
+                        // arr.push(<TextSvg key={k} text={txt[k]} y={posy += 20} />)
+                        arr.push(<TextSvg key={k} opt={{ text: txt[k], y: posy += 20, msgFunc: (msg) => { console.log(msg) } }} />)
+                    }
+                    return arr;
+                }()
 
+            }
+
+            {/* <TextSvg text={txt.t1} y={20} />
+            <TextSvg text={txt.t2} y={40} /> */}
         </svg>
 
 
