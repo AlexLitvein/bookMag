@@ -31,7 +31,7 @@ svg {
 
 .path-data{
   stroke-width: 1px;
-  stroke: blue;   
+  /* stroke: blue;    */
   fill: none;
   /* opacity: 0; */
   /* stroke-dasharray: 3 6; */
@@ -46,7 +46,12 @@ svg {
 .axis{
   stroke: black;
   stroke-width: 1px;
+  fill: none;
   marker: url('#mrkVHAxis');
+}
+
+.temperature{
+  stroke: red;
 }
 
 .txt-axis{

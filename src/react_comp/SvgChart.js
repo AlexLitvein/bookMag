@@ -51,7 +51,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const buildSvgAniPath = (min, max, data) => {
         const rc = clientRect();
         let val = 0;
-        let lnSeg = (rc.right - rc.left) / data.length; // TODO: -1
+        let lnSeg = (rc.right - rc.left) / (data.length - 1);
         let res = { do: 'M', to: 'M' };
 
         for (let i = 0; i < data.length; i++) {
@@ -80,18 +80,10 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }
 
     const renderTextAxis = (axis, arrDataSets) => {
-        console.log('renderTextAxis', arrDataSets);
-        // const out = [];
+        // console.log('renderTextAxis', arrDataSets);
         const rc = clientRect();
         const arrStrs = arrDataSets.length !== 0 ? arrDataSets[0]._id : [];
-        // arrStrs.forEach((el) => {
-        //     out.push(
-
-        //     );
-        // });
-
-        // return <TextGroup rcClient={rc} orient={'v'} offsX={30} offsY={0} texts={arrStrs} />;
-        return <TextGroup x={rc.left} y={rc.bottom} orient={'v'} offsX={30} offsY={0} texts={arrStrs} />;
+        return <TextGroup x={rc.left} y={rc.bottom} orient={'V'} offsX={30} offsY={0} texts={arrStrs} />;
     }
 
     const resize = () => {
@@ -110,14 +102,27 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     // }
     const renderDataSet = (arr) => {
         const out = [];
+        let min = 0, max = 0, cls = 'axis', clrPath = '#000';
         for (const key in arr) {
             const el = arr[key]; // [21.2, ...]
-            const propName1 = key;
-            const res = { ...buildSvgAniPath(axis[propName1].min, axis[propName1].max, el) };
+            // const propName1 = key;
+            // let {min = 0, max = 0};           
+
+            if (axis[key]) {
+                ({ min, max, cls, clrPath } = axis[key]);
+                // min = axis[key].min;
+                // max = axis[key].max;
+                // cls = axis[key].cls;
+                // clrPath = axis[key].clrPath;
+            }
+            // const min = (axis[key] && axis[key].min) || 0;
+            // const max = (axis[key] && axis[key].max) || 0;
+            // const cls = (axis[key] && axis[key].cls) || 'axis';
+            const res = { ...buildSvgAniPath(min, max, el) };
             out.push(
                 <>
                     <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
-                    <path id={`data_${key}`} className="path-data" d={res.do}></path>
+                    <path id={`data_${key}`} className={'path-data'} style={{ stroke: clrPath }} d={res.do}></path>
                 </>
             );
         }
@@ -135,6 +140,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         <svg id="graph" ref={svgElm} width={w} height={h}>
             {console.log('draw SvgChart')}
 
+            {/* TODO: add marker by color data */}
             <defs>
                 <marker id="mrkVHAxis" className="mrk" markerWidth="1" markerHeight="6" refX="0.5" refY="6"
                     orient="auto">
@@ -144,15 +150,17 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {renderAxis(axis)}
 
-            {/* {
-                dataSets.map((itm, idx) => {
-                    return renderDataSet(itm);
-                })
-            } */}
-
             {
                 renderTextAxis(0, dataSets)
             }
+
+            {
+                dataSets.map((itm, idx) => {
+                    return renderDataSet(itm);
+                })
+            }
+
+
 
 
         </svg>

@@ -25,7 +25,7 @@ import React from "react";
 
 export const TextGroup = ({ x, y, orient, offsX, offsY, texts }) => {
     let ox = offsX, oy = offsY, angle = 0;
-    if (orient === 'v') {
+    if (orient === 'V') {
         angle = -90;
         ox = offsY;
         oy = offsX;
