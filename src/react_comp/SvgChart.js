@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { TextSvg, Axle } from "./SvgComps";
+import { Axle } from "./SvgComps";
+import { TextGroup } from "./SvgTextGroup";
 
-const SvgChart = ({ options, axis, dataSets }) => {
+const SvgChart = ({ options, axis, dataSets = [] }) => {
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
+    let numSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
     const svgElm = useRef(null);
-    const cut = (n) => Math.floor(n) + 0.5;
+    const cut = (n) => Math.trunc(n) + 0.5; // trunc
 
     const clientRect = () => {
         return {
@@ -16,25 +18,40 @@ const SvgChart = ({ options, axis, dataSets }) => {
         };
     }
 
+    // const getOrthoPath = (x, y, size, numSeg, type) => {
+    //     let d = `M${cut(x)} ${cut(y)}`;
+    //     let lnSeg = cut(size / numSeg);
+    //     for (let i = 0; i < numSeg; i++) {
+    //         d += (type + lnSeg);
+    //     }
+    //     return d;
+    // }
+
     const getOrthoPath = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
-        let lnSeg = cut(size / numSeg);
-        for (let i = 0; i < numSeg; i++) {
-            d += (type + lnSeg);
+        let pos = type === 'H' ? x : y;
+        let lnSeg = size / numSeg;
+        for (let i = 1; i <= numSeg; i++) {
+            d += type + cut(pos + lnSeg * i);
         }
         return d;
     }
 
-    const resizeAxle = (type) => {
+    const buildAxlePath = (type) => {
         const rc = clientRect();
-        return getOrthoPath(rc.left, type === 'h' ? rc.bottom : rc.top, type === 'h' ? (rc.right - rc.left) : (rc.bottom - rc.top), 1, type);
+        return getOrthoPath(
+            rc.left,
+            type === 'H' ? rc.bottom : rc.top,
+            type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
+            numSeg, type
+        );
     }
 
     // data = [num1 , num2 , num3 , ...]
     const buildSvgAniPath = (min, max, data) => {
         const rc = clientRect();
         let val = 0;
-        let lnSeg = (rc.right - rc.left) / data.length;
+        let lnSeg = (rc.right - rc.left) / data.length; // TODO: -1
         let res = { do: 'M', to: 'M' };
 
         for (let i = 0; i < data.length; i++) {
@@ -56,10 +73,25 @@ const SvgChart = ({ options, axis, dataSets }) => {
         for (const key in axis) {
             const el = axis[key];
             out.push(
-                <Axle d={resizeAxle(el.type)} cls={el.cls} />
+                <Axle d={buildAxlePath(el.type)} cls={el.cls} />
             );
         }
         return out;
+    }
+
+    const renderTextAxis = (axis, arrDataSets) => {
+        console.log('renderTextAxis', arrDataSets);
+        // const out = [];
+        const rc = clientRect();
+        const arrStrs = arrDataSets.length !== 0 ? arrDataSets[0]._id : [];
+        // arrStrs.forEach((el) => {
+        //     out.push(
+
+        //     );
+        // });
+
+        // return <TextGroup rcClient={rc} orient={'v'} offsX={30} offsY={0} texts={arrStrs} />;
+        return <TextGroup x={rc.left} y={rc.bottom} orient={'v'} offsX={30} offsY={0} texts={arrStrs} />;
     }
 
     const resize = () => {
@@ -112,10 +144,14 @@ const SvgChart = ({ options, axis, dataSets }) => {
 
             {renderAxis(axis)}
 
-            {
+            {/* {
                 dataSets.map((itm, idx) => {
                     return renderDataSet(itm);
                 })
+            } */}
+
+            {
+                renderTextAxis(0, dataSets)
             }
 
 

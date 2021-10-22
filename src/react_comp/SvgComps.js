@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 // import MyGraph from "../classes/ChartObject";
 
-const Axle = ({ d, cls }) => {
-    //console.log(`create Axis`);// ${x} ${y}
+// const Axle = ({ d, cls }) => {
+//     console.log(`create Axis arguments:`, arguments);// ${x} ${y}
+//     return (
+//         <path d={d} class={cls} ></path>
+//     );
+// }
+
+export function Axle({ d, cls }) {
+    console.log(`create Axis arguments:`, arguments);// ${x} ${y}
     return (
         <path d={d} class={cls} ></path>
     );
@@ -43,4 +50,4 @@ const TextSvg = ({ opt }) => {
 //     );
 // }
 
-export { Axle, TextSvg }; // Marker, 
+// export { Axle, TextSvg }; // Marker, 
