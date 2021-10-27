@@ -39,6 +39,10 @@ svg {
   transition: opacity 1s;
 }
 
+.path-data:hover{
+  stroke-width: 2px;
+}
+
 .visible{
   opacity: 1;
 }
@@ -85,7 +89,7 @@ svg {
 } */
 
 .mrk{
-  /* fill: red; */
+  fill: none;
   stroke: black;
   /* stroke-width: 1px; */
   /* display: none; */
