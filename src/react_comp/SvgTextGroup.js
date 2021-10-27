@@ -23,7 +23,7 @@ import React from "react";
 //     );
 // }
 
-export const TextGroup = ({ x, y, orient, offsX, offsY, texts }) => {
+export const TextGroup = ({ x, y, orient, offsX, offsY, texts, clr }) => {
     let ox = offsX, oy = offsY, angle = 0;
     if (orient === 'V') {
         angle = -90;
@@ -31,7 +31,7 @@ export const TextGroup = ({ x, y, orient, offsX, offsY, texts }) => {
         oy = offsX;
     }
     return (
-        <g id="x_text" class="txt-axis" transform={`translate(${x}, ${y}) rotate(${angle})`}>
+        <g class="txt-axis" fill={clr} transform={`translate(${x}, ${y}) rotate(${angle})`}>
             {
                 texts.map((el, i) => {
                     return (<TextSvg x={ox * i} y={oy * i} text={el} />);

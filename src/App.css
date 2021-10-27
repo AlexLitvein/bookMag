@@ -55,7 +55,7 @@ svg {
 }
 
 .txt-axis{
-  font-family: lato-normal;
+  /* font-family: lato-normal; */
   font-size: 10px;
   text-anchor: end;
   /* text-align: left; */

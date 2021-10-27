@@ -5,11 +5,8 @@ import { TextGroup } from "./SvgTextGroup";
 const SvgChart = ({ options, axis, dataSets = [] }) => {
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
-    let numSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
-    const svgElm = useRef(null);
-    const cut = (n) => Math.trunc(n) + 0.5; // trunc
 
-    const clientRect = () => {
+    const _clientRect = () => { // oreder!
         return {
             left: options.padding.left,
             top: options.padding.top,
@@ -17,17 +14,19 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             bottom: h - options.padding.bottom
         };
     }
+    // let options = opt;
+    let rcClient = _clientRect();
+    let numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
+    let lnHSeg = (rcClient.right - rcClient.left) / numHSeg;
+    let lnVSeg = (rcClient.bottom - rcClient.top) / (options.countVLabels - 1);
+    // console.log(`lnSeg: ${lnSeg} w: ${w}`);
 
-    // const getOrthoPath = (x, y, size, numSeg, type) => {
-    //     let d = `M${cut(x)} ${cut(y)}`;
-    //     let lnSeg = cut(size / numSeg);
-    //     for (let i = 0; i < numSeg; i++) {
-    //         d += (type + lnSeg);
-    //     }
-    //     return d;
-    // }
+    let numMainVLine = 2;
+    let numMainHLine = 2;
+    const svgElm = useRef(null);
+    const cut = (n) => Math.trunc(n) + 0.5; // trunc
 
-    const getOrthoPath = (x, y, size, numSeg, type) => {
+    const _getOrthoPath = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
         let pos = type === 'H' ? x : y;
         let lnSeg = size / numSeg;
@@ -37,28 +36,28 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return d;
     }
 
-    const buildAxlePath = (type) => {
-        const rc = clientRect();
-        return getOrthoPath(
+    const buildAxlePath = (rc, type) => {
+        // const rc = clientRect();
+        return _getOrthoPath(
             rc.left,
             type === 'H' ? rc.bottom : rc.top,
             type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
-            numSeg, type
+            options.countVLabels - 1, type // numHSeg
         );
     }
 
     // data = [num1 , num2 , num3 , ...]
-    const buildSvgAniPath = (min, max, data) => {
-        const rc = clientRect();
+    const buildSvgAniPath = (rc, min, max, data) => {
+        // const rc = clientRect();
         let val = 0;
-        let lnSeg = (rc.right - rc.left) / (data.length - 1);
+        // let lnSeg = (rc.right - rc.left) / (data.length - 1);
         let res = { do: 'M', to: 'M' };
 
         for (let i = 0; i < data.length; i++) {
             val = data[i];
             val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
-            res.do += `${cut(rc.left + lnSeg * i)} ${cut(rc.bottom)}`;
-            res.to += `${cut(rc.left + lnSeg * i)} ${cut(rc.bottom - val)}`;
+            res.do += `${cut(rc.left + lnHSeg * i)} ${cut(rc.bottom)}`;
+            res.to += `${cut(rc.left + lnHSeg * i)} ${cut(rc.bottom - val)}`;
 
             if (i < data.length - 1) {
                 res.do += 'L';
@@ -68,28 +67,77 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return res;
     }
 
-    const renderAxis = (axis) => {
+    const renderPathAxis = (rc, axis) => {
         const out = [];
         for (const key in axis) {
             const el = axis[key];
             out.push(
-                <Axle d={buildAxlePath(el.type)} cls={el.cls} />
+                <Axle d={buildAxlePath(rc, el.type)} cls={el.cls} />
             );
         }
         return out;
     }
 
-    const renderTextAxis = (axis, arrDataSets) => {
-        // console.log('renderTextAxis', arrDataSets);
-        const rc = clientRect();
-        const arrStrs = arrDataSets.length !== 0 ? arrDataSets[0]._id : [];
-        return <TextGroup x={rc.left} y={rc.bottom} orient={'V'} offsX={30} offsY={0} texts={arrStrs} />;
+    const renderVTextAxis = (rc, dataFieldText, arrDataSets) => {
+        let arrStrs = arrDataSets.length !== 0 ? arrDataSets[0][dataFieldText] : [];
+        arrStrs = arrStrs.map((el) => { // el = 2021-01-04T15:00:00.034Z
+            // console.log(el);
+            let data = new Date(el);
+            const dataStr = ('0' + data.getHours()).slice(-2) + '/' + ('0' + data.getDate()).slice(-2) + '/' + ('0' + (data.getMonth() + 1)).slice(-2) + '/' + data.getFullYear() % 100;
+            return dataStr;
+        });
+        return <TextGroup x={rc.left + (options.fontH / 2)} y={rc.bottom + (options.fontH / 2)} orient={'V'} offsX={lnHSeg} offsY={0} texts={arrStrs} />;
     }
 
-    const resize = () => {
+    const renderHTextAxle = (x, y, axle) => {
+        const arrStrs = [];
+        let delta = (Math.abs(axle.min) + axle.max) / (options.countVLabels - 1);
+        arrStrs.push(axle.max);
+        for (let i = 1; i <= options.countVLabels - 2; i++) {
+            arrStrs.push(axle.max - i * delta);
+        }
+        arrStrs.push(axle.min);
+        return <TextGroup x={x} y={y} orient={'H'} offsX={0} offsY={lnVSeg} texts={arrStrs} clr={axle.clrPath} />;
+    }
+
+    const renderHTextAxis = (rc) => {
+        const res = [];
+        let cntAxis = Object.keys(axis).length;
+        let dy = options.fontH;
+        let startPos = rc.top - (cntAxis * dy / 2);
+        for (const key in axis) {
+            res.push(renderHTextAxle(rc.left - (options.fontH / 2), startPos += dy, axis[key]));
+        }
+        return res;
+    }
+
+    // const resize = () => {
+    //     let { width, height } = svgElm.current.parentElement.getBoundingClientRect();
+    //     setW(width);
+    //     setH(height);
+
+    //     // rcClient = {
+    //     //     left: options.padding.left,
+    //     //     top: options.padding.top,
+    //     //     right: width - options.padding.right,
+    //     //     bottom: height - options.padding.bottom
+    //     // };
+    //     rcClient.left = this.options.padding.left;
+    //     rcClient.top = options.padding.top;
+    //     rcClient.right = width - options.padding.right;
+    //     rcClient.bottom = height - options.padding.bottom;
+
+
+    //     console.log('rcClient', rcClient);
+    // }
+
+    function resize() {
         let { width, height } = svgElm.current.parentElement.getBoundingClientRect();
         setW(width);
         setH(height);
+        // rcClient = _clientRect();
+
+        // console.log('rcClient', rcClient);
     }
 
     // ===========================
@@ -118,7 +166,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             // const min = (axis[key] && axis[key].min) || 0;
             // const max = (axis[key] && axis[key].max) || 0;
             // const cls = (axis[key] && axis[key].cls) || 'axis';
-            const res = { ...buildSvgAniPath(min, max, el) };
+            const res = { ...buildSvgAniPath(rcClient, min, max, el) };
             out.push(
                 <>
                     <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
@@ -148,17 +196,22 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
                 </marker>
             </defs>
 
-            {renderAxis(axis)}
-
-            {
-                renderTextAxis(0, dataSets)
-            }
-
             {
                 dataSets.map((itm, idx) => {
                     return renderDataSet(itm);
                 })
             }
+
+            {renderPathAxis(rcClient, axis)}
+
+            {
+                renderVTextAxis(rcClient, '_id', dataSets)
+
+            }
+
+            {renderHTextAxis(rcClient)}
+
+
 
 
 

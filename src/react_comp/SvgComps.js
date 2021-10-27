@@ -9,7 +9,7 @@ import React, { useState, useEffect } from "react";
 // }
 
 export function Axle({ d, cls }) {
-    console.log(`create Axis arguments:`, arguments);// ${x} ${y}
+    // console.log(`create Axis arguments:`, arguments);// ${x} ${y}
     return (
         <path d={d} class={cls} ></path>
     );
