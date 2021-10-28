@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { ChartCursor } from "./ChartCursor";
 import { Axle, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
@@ -148,11 +149,11 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     //      p:   [36.9 ...],
     //      h:   [12.5 ...]
     // }
-    const renderDataSet = (arr) => {
+    const renderDataSet = (obj) => {
         const out = [];
         let min = 0, max = 0, cls = 'axis', clrPath = '#000', mrk = "url('#mrkVHAxis')";
-        for (const key in arr) {
-            const el = arr[key]; // [21.2, ...]
+        for (const key in obj) {
+            const el = obj[key]; // [21.2, ...]
             if (axis[key]) {
                 ({ min, max, cls, clrPath } = axis[key]);
                 cls = 'path-data';
@@ -182,10 +183,10 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             out.push(
                 // <SvgMarker id={"mrkPaths"} cls={"mrk"}
                 <SvgMarker id={`mrk_${key}`}
-                    cls={"mrk"}
-                    w={10} h={10}
-                    refX={5} refY={5}
-                    mrkEl={<circle cx="5" cy="5" r="5" style={{ fill: el.clrPath }} />}
+                    cls={`mrk_${key}`}
+                    w={8} h={8}
+                    refX={4} refY={4}
+                    mrkEl={<circle cx="4" cy="4" r="4" style={{ fill: el.clrPath }} />}
                 />
             );
         }
@@ -197,28 +198,27 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         window.addEventListener('resize', (e) => {
             resize();
         });
+
+        // svgElm.current.addEventListener('click', (e) => {
+        //     console.log('click', e.clientX);
+        // });
+
     }, []); // componentDidMount()
 
     return (
         <svg id="graph" ref={svgElm} width={w} height={h}>
             {console.log('draw SvgChart')}
 
-            {/* TODO: маркер не изменяет размер при изм размера его используещего */}
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={1} h={6}
                 refX={0.5} refY={6}
                 mrkEl={<line x2="0" y2="6" />}
             />
 
-            {/* <SvgMarker id={"mrkPaths"} cls={"mrk"}
-                w={10} h={10}
-                refX={5} refY={5}
-                mrkEl={<circle cx="5" cy="5" r="5" />}
-            /> */}
-
             {renderMarkers()}
 
 
+            <ChartCursor svgElm={svgElm} rc={rcClient} lnSegX={lnHSeg} axis={axis} data={dataSets} />
 
             {renderPathAxis(rcClient, axis)}
 

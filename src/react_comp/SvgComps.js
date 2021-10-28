@@ -4,6 +4,7 @@ export function Axle({ d, cls }) {
     // console.log(`create Axis arguments:`, arguments);// ${x} ${y}
     return (
         <path d={d} class={cls} ></path>
+        // <path d={d} {...props}></path>
     );
 }
 

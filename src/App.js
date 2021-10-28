@@ -16,7 +16,7 @@ const axis = {
 const options = {
   padding: { top: 15, right: 10, bottom: 60, left: 34 },
   fontH: 10,
-  countVLabels: 3,
+  countVLabels: 5,
 };
 
 // TODO: перенести статус загрузки в pathRdcr

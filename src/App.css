@@ -25,7 +25,7 @@ svg {
 }
 
 .path-data{
-  stroke-width: 1px;
+  stroke-width: 2px;
   /* stroke: blue;    */
   fill: none;
   /* opacity: 0; */
@@ -35,7 +35,7 @@ svg {
 }
 
 .path-data:hover{
-  stroke-width: 2px;
+  stroke-width: 4px;
 }
 
 .visible{
@@ -58,16 +58,28 @@ svg {
   /* transform: translate(); */
 }
 
-.mrk{
-  /* fill: none; */
-  /* stroke: black; */
-  /* stroke-width: 1px; */
-  /* display: none; */
+.cursor{
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-dasharray: 4, 4;
+}
+
+.note{
+  fill:chocolate;
+  stroke: black;
+  stroke-width: 1px;
+  /* stroke-dasharray: 4, 4; */
+}
+
+.note-text{
+  font-size: 10px;
 }
 
 .mrk-axis{
   /* fill: none; */
   stroke: black;
   stroke-width: 1px;
+  
   /* display: none; */
 }
