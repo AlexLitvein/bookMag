@@ -10,8 +10,7 @@
   background-color: rgb(223, 128, 128);
   /* flex-grow: 1;
   margin: 100px;
-  position: relative; */
-  
+  position: relative; */  
   height: 50%; 
 }
 
@@ -25,17 +24,13 @@ svg {
   /* width: 100%; */
 }
 
-.p1{
-  transition: all 1s ease-out;
-}
-
 .path-data{
   stroke-width: 1px;
   /* stroke: blue;    */
   fill: none;
   /* opacity: 0; */
   /* stroke-dasharray: 3 6; */
-  marker: url('#mrkVHAxis');
+  /* marker: url('#mrkPaths'); */
   transition: opacity 1s;
 }
 
@@ -49,13 +44,9 @@ svg {
 
 .axis{
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 2px;
   fill: none;
   marker: url('#mrkVHAxis');
-}
-
-.temperature{
-  stroke: red;
 }
 
 .txt-axis{
@@ -67,30 +58,16 @@ svg {
   /* transform: translate(); */
 }
 
-.txt-pa{
-  fill: green; 
-}
-.txt-hum{
-  fill: blue;
-}
-.txt-temp{
-  /* stroke: darkred; */
-  fill: rgb(172, 13, 13);
-}
-
-
-
-#path1:hover {
-  stroke: darkred;
-}
-
-/* #mCircle:hover{
-  fill: darkgreen;
-} */
-
 .mrk{
-  fill: none;
-  stroke: black;
+  /* fill: none; */
+  /* stroke: black; */
   /* stroke-width: 1px; */
+  /* display: none; */
+}
+
+.mrk-axis{
+  /* fill: none; */
+  stroke: black;
+  stroke-width: 1px;
   /* display: none; */
 }

@@ -11,6 +11,8 @@ const axis = {
   h: { name: 'Влажность', min: 0, max: 100, type: 'V', cls: 'axis', clrPath: '#FFFA40' },
 };
 
+// const marker
+
 const options = {
   padding: { top: 15, right: 10, bottom: 60, left: 34 },
   fontH: 10,

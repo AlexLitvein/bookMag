@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Axle } from "./SvgComps";
+import { Axle, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
 const SvgChart = ({ options, axis, dataSets = [] }) => {
@@ -150,28 +150,43 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     // }
     const renderDataSet = (arr) => {
         const out = [];
-        let min = 0, max = 0, cls = 'axis', clrPath = '#000';
+        let min = 0, max = 0, cls = 'axis', clrPath = '#000', mrk = "url('#mrkVHAxis')";
         for (const key in arr) {
             const el = arr[key]; // [21.2, ...]
-            // const propName1 = key;
-            // let {min = 0, max = 0};           
-
             if (axis[key]) {
                 ({ min, max, cls, clrPath } = axis[key]);
-                // min = axis[key].min;
-                // max = axis[key].max;
-                // cls = axis[key].cls;
-                // clrPath = axis[key].clrPath;
+                cls = 'path-data';
+                mrk = `url("#mrk_${key}")`;
             }
-            // const min = (axis[key] && axis[key].min) || 0;
-            // const max = (axis[key] && axis[key].max) || 0;
-            // const cls = (axis[key] && axis[key].cls) || 'axis';
+
             const res = { ...buildSvgAniPath(rcClient, min, max, el) };
             out.push(
                 <>
                     <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
-                    <path id={`data_${key}`} className={'path-data'} style={{ stroke: clrPath }} d={res.do}></path>
+                    <path
+                        id={`data_${key}`}
+                        className={cls}
+                        style={{ stroke: clrPath, marker: mrk }}
+                        d={res.do}>
+                    </path>
                 </>
+            );
+        }
+        return out;
+    }
+
+    const renderMarkers = () => {
+        const out = [];
+        for (const key in axis) {
+            const el = axis[key];
+            out.push(
+                // <SvgMarker id={"mrkPaths"} cls={"mrk"}
+                <SvgMarker id={`mrk_${key}`}
+                    cls={"mrk"}
+                    w={10} h={10}
+                    refX={5} refY={5}
+                    mrkEl={<circle cx="5" cy="5" r="5" style={{ fill: el.clrPath }} />}
+                />
             );
         }
         return out;
@@ -188,22 +203,22 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         <svg id="graph" ref={svgElm} width={w} height={h}>
             {console.log('draw SvgChart')}
 
-            {/* TODO: add marker by color data */}
             {/* TODO: маркер не изменяет размер при изм размера его используещего */}
-            <defs>
-                <marker id="mrkVHAxis" className="mrk" markerWidth="10" markerHeight="10" refX="5" refY="5"
-                    orient="auto">
-                    {/* <line x1="0" y1="0" x2="0" y2="6" /> */}
-                    {/* <line x2="0" y2="6" /> */}
-                    <circle cx="5" cy="5" r="5" />
-                </marker>
-            </defs>
+            <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
+                w={1} h={6}
+                refX={0.5} refY={6}
+                mrkEl={<line x2="0" y2="6" />}
+            />
 
-            {
-                dataSets.map((itm, idx) => {
-                    return renderDataSet(itm);
-                })
-            }
+            {/* <SvgMarker id={"mrkPaths"} cls={"mrk"}
+                w={10} h={10}
+                refX={5} refY={5}
+                mrkEl={<circle cx="5" cy="5" r="5" />}
+            /> */}
+
+            {renderMarkers()}
+
+
 
             {renderPathAxis(rcClient, axis)}
 
@@ -214,7 +229,11 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {renderHTextAxis(rcClient)}
 
-
+            {
+                dataSets.map((itm, idx) => {
+                    return renderDataSet(itm);
+                })
+            }
 
 
 
