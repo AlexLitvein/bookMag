@@ -4,6 +4,8 @@ import { Axle, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
 const SvgChart = ({ options, axis, dataSets = [] }) => {
+    console.log('call SvgChart');
+
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
 
@@ -218,7 +220,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {renderMarkers()}
 
 
-            <ChartCursor svgElm={svgElm} rc={rcClient} lnSegX={lnHSeg} axis={axis} data={dataSets} />
+
 
             {renderPathAxis(rcClient, axis)}
 
@@ -235,7 +237,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
                 })
             }
 
-
+            <ChartCursor svgElm={svgElm} rc={rcClient} lnSegX={lnHSeg} axis={axis} data={dataSets} />
 
 
         </svg>
