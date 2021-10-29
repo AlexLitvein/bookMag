@@ -6,6 +6,8 @@ import { TextGroup } from "./SvgTextGroup";
 const SvgChart = ({ options, axis, dataSets = [] }) => {
     console.log('call SvgChart');
 
+    // options.countVLabels=2;
+
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
 
@@ -237,7 +239,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
                 })
             }
 
-            <ChartCursor svgElm={svgElm} rc={rcClient} lnSegX={lnHSeg} axis={axis} data={dataSets} />
+            <ChartCursor svgElm={svgElm} rcClient={rcClient} lnSegX={lnHSeg} axis={axis} data={dataSets} />
 
 
         </svg>
