@@ -12,6 +12,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
 
+    // ширину линии использовать кратную 2 пикселям, координаты целочисоенные
+    const cut = (n) => Math.trunc(n);// + 0.5
     const _clientRect = () => { // oreder!
         return {
             left: options.padding.left,
@@ -23,8 +25,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     opt.rcClient = _clientRect();
     opt.numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
-    opt.lnHSeg = (opt.rcClient.right - opt.rcClient.left) / opt.numHSeg;
-    let lnVSeg = (opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1);
+    opt.lnHSeg = cut((opt.rcClient.right - opt.rcClient.left) / opt.numHSeg);
+    let lnVSeg = cut((opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1));
     // console.log(`lnSeg: ${lnSeg} w: ${w}`);
 
     let numMainVLine = 2;
@@ -33,7 +35,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const svgElm = useRef(null);
     const txtRef = useRef(null);
     // const [bigestStr, setStr] = useState('');
-    const cut = (n) => Math.trunc(n) + 0.5; // trunc
+    
 
     const _getOrthoPath = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
@@ -97,7 +99,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }
 
     const renderVTextAxis = (rc, dataFieldText, arrDataSets) => {
-        let dx = options.fontBBoxHeight * 0.3;
+        let dx = options.fontBBoxHeight >> 2;
         let arrStrs = arrDataSets.length !== 0 ? arrDataSets[0][dataFieldText] : [];
         arrStrs = arrStrs.map((el) => { // el = 2021-01-04T15:00:00.034Z
             // console.log(el);
@@ -133,32 +135,13 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return res;
     }
 
-    // const resize = () => {
-    //     let { width, height } = svgElm.current.parentElement.getBoundingClientRect();
-    //     setW(width);
-    //     setH(height);
-
-    //     // rcClient = {
-    //     //     left: options.padding.left,
-    //     //     top: options.padding.top,
-    //     //     right: width - options.padding.right,
-    //     //     bottom: height - options.padding.bottom
-    //     // };
-    //     rcClient.left = this.options.padding.left;
-    //     rcClient.top = options.padding.top;
-    //     rcClient.right = width - options.padding.right;
-    //     rcClient.bottom = height - options.padding.bottom;
-
-
-    //     console.log('rcClient', rcClient);
-    // }
-
     function resize() {
         let { width, height } = svgElm.current.parentElement.getBoundingClientRect();
-        setW(width);
-        setH(height);
+        // возвращаются float коорд
+        setW(cut(width));
+        setH(cut(height));
 
-        // console.log('rcClient', rcClient);
+        // console.log('resize height', height);
     }
 
     // ===========================
@@ -199,7 +182,6 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         for (const key in axis) {
             const el = axis[key];
             out.push(
-                // <SvgMarker id={"mrkPaths"} cls={"mrk"}
                 <SvgMarker id={`mrk_${key}`}
                     cls={`mrk_${key}`}
                     w={8} h={8}
@@ -236,8 +218,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {/* {calcAvgSymW()} */}
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
-                w={1} h={6}
-                refX={0.5} refY={6}
+                w={2} h={6}
+                refX={1} refY={6}
                 mrkEl={<line x2="0" y2="6" />}
             />
 
