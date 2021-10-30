@@ -4,6 +4,7 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
     console.log("Call ChartCursor");
 
     gObj.noteW = 0;
+    gObj.noteH = 0;
     const [_x, setX] = useState(gObj.rcClient.left);
     const [_y, setY] = useState(gObj.rcClient.top);
 
@@ -76,6 +77,7 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
                 let str = `${axis[key].name}: ${aprox(v1, v2, gObj.lnHSeg, posInRange).toFixed(1)}`;
 
                 gObj.noteW = str.length * gObj.avgSymW > gObj.noteW ? str.length * gObj.avgSymW : gObj.noteW;
+                gObj.noteH += gObj.fontBBoxHeight;
 
                 // console.log('gObj.noteW', gObj.noteW);
                 // bigestStr = Math.max(bigestStr.length, str.length);               
@@ -86,17 +88,8 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
     }
 
     useEffect(() => {
-        // getBiggestStr(axis);
-        // console.log("useEffect bigestStr", bigestStr);
-        // setLen(txtRef.current.getComputedTextLength());
-
-
         svgElm.current.addEventListener('click', (e) => {
-            // setX(e.offsetX);
-            // setY(e.offsetY);
             setPos(e.offsetX, e.offsetY);
-
-
             // console.log(`rc.left ${rc.left} rc.right ${rc.right} rc.bottom ${rc.bottom}`);
         });
 
@@ -123,10 +116,6 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
         <>
             {console.log('draw ChartCursor')}
 
-            {/* Нужно для установки размеров ОТРЕНДЕРЕНОЙ строки SVGTextElm */}
-            {/* {gObj.setTextSize()} */}
-
-            {/* <text x={0} y={-50} className="note-text" ref={txtRef}>{bigestStr}</text> */}
             <path d={`M${_x} ${gObj.rcClient.top}V${gObj.rcClient.bottom}`} className="cursor"></path>
             <FlyNote x={_x} y={_y} gObj={gObj} arrStr={getVal(_x, _y, 0)} />
         </>
@@ -135,14 +124,47 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
 
 export function FlyNote({ x, y, gObj, arrStr }) {
     // console.log('FlyNote gObj', gObj);
+    const calcRect = () => {
+        let out = {
+            x: x,
+            y: y,
+            // width: gObj.noteW + 8,
+            // height: (arrStr.length + 0) * gObj.fontBBoxHeight,
+        };
+
+        // if (out.x + out.width > gObj.rcClient.right) {
+        //     out.x = out.x - out.width;
+        // }
+        if (out.x + gObj.noteW > gObj.rcClient.right) {
+            out.x = out.x - gObj.noteW;
+        }
+
+        if (out.y + gObj.noteH > gObj.rcClient.bottom) {
+            out.y = gObj.rcClient.bottom - gObj.noteH;
+        }
+
+        return out;
+    }
+
+    const [pos, setPos]=useState({x:0, y:0});
+    // const [rc, setRc] = useState({ x: 0, y: 0, width: 0, height: 0 });
+    // const [rc, setRc] = useState(calcRect());
+
+    // setRc(calcRect());
+    useEffect(() => {        
+        // setRc(calcRect());
+        setPos(calcRect());
+    }, [x, y]);
 
     if (gObj.noteW) {
         return (
             <>
-                <rect x={x} y={y} width={gObj.noteW + 8} height={(arrStr.length + 0) * gObj.fontBBoxHeight} className="note" />
+                {/* <rect {...rc} className="note" /> */}
+                <rect {...pos} width={gObj.noteW} height={gObj.noteH} className="note" />
                 {arrStr.map((el, i) => {
                     // return <text x={x + 4} y={y + (bbox.height / 2) + (i + 0) * bbox.height} className="note-text">{el}  </text>;
-                    return <text x={x + 4} y={y + (gObj.fontBBoxHeight * 0.7) + (i + 0) * gObj.fontBBoxHeight} className="note-text">{el}  </text>;
+                    // return <text x={x + 4} y={y + (gObj.fontBBoxHeight * 0.7) + (i + 0) * gObj.fontBBoxHeight} className="note-text">{el}  </text>;
+                    return <text x={pos.x + 4} y={pos.y + (gObj.fontBBoxHeight * 0.7) + (i + 0) * gObj.fontBBoxHeight} className="note-text">{el}  </text>;
                 })
                 }
             </>
