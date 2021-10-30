@@ -5,7 +5,7 @@ import SvgChart from './react_comp/SvgChart';
 import { getSensData, selAniPaths } from './dataRdcrs/paths';
 
 const axis = {
-  // _id: { name: 'Дата', min: 0, max: 0, type: 'H', cls: 'axis' },
+  _id: { name: 'Дата', min: 0, max: 0, type: 'H', cls: 'axis', clrPath: '#000ff00' },
   t: { name: 'Temperature', min: -50, max: 50, type: 'V', cls: 'axis', clrPath: '#FF0000' },
   p: { name: 'Давление', min: 0, max: 1000, type: 'V', cls: 'axis', clrPath: '#4F4FD9' },
   h: { name: 'Влажность', min: 0, max: 100, type: 'V', cls: 'axis', clrPath: '#FFFA40' },

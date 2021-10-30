@@ -72,8 +72,12 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
         for (const key in obj) {
             const el = obj[key]; // [21.2, ...]
             if (axis[key]) {
-                // ({ min, max, cls, clrPath } = axis[key]);
-                let v1 = el[idxDataHit], v2 = el[idxDataHit + 1];
+               
+                if (axis[key].type === 'H') {
+                    continue;
+                }
+
+                let v1 = el[idxDataHit], v2 = el[idxDataHit + 1] || v1;
                 let str = `${axis[key].name}: ${aprox(v1, v2, gObj.lnHSeg, posInRange).toFixed(1)}`;
 
                 gObj.noteW = str.length * gObj.avgSymW > gObj.noteW ? str.length * gObj.avgSymW : gObj.noteW;
@@ -97,17 +101,8 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
 
             // console.log('mouseover', e);
             if (e.buttons === 1) {
-                // setX(e.offsetX);
-                // setY(e.offsetY);
                 setPos(e.offsetX, e.offsetY);
             }
-            // e.preventDefault();
-            // e.stopPropagation();
-            // e.cancelBubble = true;
-            // e.returnValue = false;
-            // console.log('click clientY', e.clientY);
-            // console.log('click offsetY', e.offsetY);
-
         });
 
     }, []); // componentDidMount()
@@ -146,12 +141,12 @@ export function FlyNote({ x, y, gObj, arrStr }) {
         return out;
     }
 
-    const [pos, setPos]=useState({x:0, y:0});
+    const [pos, setPos] = useState({ x: 0, y: 0 });
     // const [rc, setRc] = useState({ x: 0, y: 0, width: 0, height: 0 });
     // const [rc, setRc] = useState(calcRect());
 
     // setRc(calcRect());
-    useEffect(() => {        
+    useEffect(() => {
         // setRc(calcRect());
         setPos(calcRect());
     }, [x, y]);

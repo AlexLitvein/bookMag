@@ -22,8 +22,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }
 
     opt.rcClient = _clientRect();
-    let numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
-    opt.lnHSeg = (opt.rcClient.right - opt.rcClient.left) / numHSeg;
+    opt.numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
+    opt.lnHSeg = (opt.rcClient.right - opt.rcClient.left) / opt.numHSeg;
     let lnVSeg = (opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1);
     // console.log(`lnSeg: ${lnSeg} w: ${w}`);
 
@@ -46,12 +46,12 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }
 
     const buildAxlePath = (rc, type) => {
-        // const rc = clientRect();
         return _getOrthoPath(
             rc.left,
             type === 'H' ? rc.bottom : rc.top,
             type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
-            options.countVLabels - 1, type // numHSeg
+            type === 'H' ? opt.numHSeg : options.countVLabels - 1,
+            type
         );
     }
 
@@ -63,25 +63,6 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         console.log('setTextSize avgSymW', opt.avgSymW);
         console.log('setTextSize fontBBoxHeight', opt.fontBBoxHeight);
     }
-
-    // const getBiggestStr = (axis) => {
-    //     let tmp = '';
-    //     for (const key in axis) {
-    //         let str = `${axis[key].name}: -304.5`;
-    //         tmp = str.length > tmp.length ? str : tmp;
-    //     }
-    //     setStr(tmp);
-    // }
-
-    // opt.setTextSize = () => {
-    //     let bbox = txtRef.current?.getBBox() || { width: 0, height: 0 };
-
-    //     opt.biggestDataStrBBoxWidth = bbox.width;
-    //     opt.fontBBoxHeight = bbox.height;
-    //     // console.log('setTextSize bbox', txtRef.current?.getBBox());
-    // }
-
-
 
     // data = [num1 , num2 , num3 , ...]
     const buildSvgAniPath = (rc, min, max, data) => {
@@ -140,11 +121,14 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     const renderHTextAxis = (rc) => {
         const res = [];
-        let cntAxis = Object.keys(axis).length;
+        let cntAxis = Object.keys(axis).length - 1; // -1 тк первая ось горизонтальная
         let dy = options.fontBBoxHeight * 1;
-        let startPos = rc.top - (cntAxis * dy / 2);
+        let startPos = rc.top - ((cntAxis * dy) / 2);
         for (const key in axis) {
-            res.push(renderHTextAxle(rc.left - dy/2, startPos += dy, axis[key]));
+            if (axis[key].type === 'H') {
+                continue;
+            }
+            res.push(renderHTextAxle(rc.left - dy / 2, startPos += dy, axis[key]));
         }
         return res;
     }
@@ -187,23 +171,21 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     // }
     const renderDataSet = (obj) => {
         const out = [];
-        let min = 0, max = 0, cls = 'axis', clrPath = '#000', mrk = "url('#mrkVHAxis')";
+        let min = 0, max = 0, clrPath = '';
         for (const key in obj) {
             const el = obj[key]; // [21.2, ...]
-            if (axis[key]) {
-                ({ min, max, cls, clrPath } = axis[key]);
-                cls = 'path-data';
-                mrk = `url("#mrk_${key}")`;
+            if (axis[key].type === 'H') {
+                continue;
             }
-
+            ({ min, max, clrPath } = axis[key]);
             const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
             out.push(
                 <>
                     <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
                     <path
                         id={`data_${key}`}
-                        className={cls}
-                        style={{ stroke: clrPath, marker: mrk }}
+                        className={'path-data'}
+                        style={{ stroke: clrPath, marker: `url("#mrk_${key}")` }}
                         d={res.do}>
                     </path>
                 </>
@@ -250,7 +232,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {/* Для вычисления высоты и ширины текста */}
             {/* <text x={0} y={50} className="note-text" ref={txtRef}>{bigestStr}</text> */}
-            <text x={0} y={-50} className="note-text" ref={txtRef}>aeiouybcdfghjklmnpqrstvwyzW</text>
+            <text x={0} y={-70} className="note-text" ref={txtRef}>aeiouybcdfghjklmnpqrstvwyzW</text>
             {/* {calcAvgSymW()} */}
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
