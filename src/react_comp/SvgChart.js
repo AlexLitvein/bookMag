@@ -6,8 +6,9 @@ import { TextGroup } from "./SvgTextGroup";
 const SvgChart = ({ options, axis, dataSets = [] }) => {
     console.log('call SvgChart');
 
-    // options.countVLabels=2;
+    // TODO: resize padding
 
+    let opt = options;
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
 
@@ -19,16 +20,19 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             bottom: h - options.padding.bottom
         };
     }
-    // let options = opt;
-    let rcClient = _clientRect();
+    
+    opt.rcClient = _clientRect();
     let numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
-    let lnHSeg = (rcClient.right - rcClient.left) / numHSeg;
-    let lnVSeg = (rcClient.bottom - rcClient.top) / (options.countVLabels - 1);
+    opt.lnHSeg = (opt.rcClient.right - opt.rcClient.left) / numHSeg;
+    let lnVSeg = (opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1);
     // console.log(`lnSeg: ${lnSeg} w: ${w}`);
 
     let numMainVLine = 2;
     let numMainHLine = 2;
+
     const svgElm = useRef(null);
+    const txtRef = useRef(null);
+    const [bigestStr, setStr] = useState('');
     const cut = (n) => Math.trunc(n) + 0.5; // trunc
 
     const _getOrthoPath = (x, y, size, numSeg, type) => {
@@ -51,6 +55,25 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         );
     }
 
+    const getBiggestStr = (axis) => {
+        let tmp = '';
+        for (const key in axis) {
+            let str = `${axis[key].name}: -304.5`;
+            tmp = str.length > tmp.length ? str : tmp;
+        }
+        setStr(tmp);
+    }
+
+    opt.setTextSize = () => {
+        let bbox = txtRef.current?.getBBox() || {width: 0, height:0};
+        opt.fontBBoxHeight = bbox.height;
+        opt.biggestDataStrBBoxWidth = bbox.width;
+
+        // console.log('setTextSize bbox', txtRef.current?.getBBox());
+    }
+
+    
+
     // data = [num1 , num2 , num3 , ...]
     const buildSvgAniPath = (rc, min, max, data) => {
         // const rc = clientRect();
@@ -61,8 +84,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         for (let i = 0; i < data.length; i++) {
             val = data[i];
             val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
-            res.do += `${cut(rc.left + lnHSeg * i)} ${cut(rc.bottom)}`;
-            res.to += `${cut(rc.left + lnHSeg * i)} ${cut(rc.bottom - val)}`;
+            res.do += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom)}`;
+            res.to += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom - val)}`;
 
             if (i < data.length - 1) {
                 res.do += 'L';
@@ -91,7 +114,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             const dataStr = ('0' + data.getHours()).slice(-2) + '/' + ('0' + data.getDate()).slice(-2) + '/' + ('0' + (data.getMonth() + 1)).slice(-2) + '/' + data.getFullYear() % 100;
             return dataStr;
         });
-        return <TextGroup x={rc.left + (options.fontH / 2)} y={rc.bottom + (options.fontH / 2)} orient={'V'} offsX={lnHSeg} offsY={0} texts={arrStrs} />;
+        return <TextGroup x={rc.left + (options.fontH / 2)} y={rc.bottom + (options.fontH / 2)} orient={'V'} offsX={opt.lnHSeg} offsY={0} texts={arrStrs} />;
     }
 
     const renderHTextAxle = (x, y, axle) => {
@@ -140,7 +163,6 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         let { width, height } = svgElm.current.parentElement.getBoundingClientRect();
         setW(width);
         setH(height);
-        // rcClient = _clientRect();
 
         // console.log('rcClient', rcClient);
     }
@@ -164,7 +186,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
                 mrk = `url("#mrk_${key}")`;
             }
 
-            const res = { ...buildSvgAniPath(rcClient, min, max, el) };
+            const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
             out.push(
                 <>
                     <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
@@ -199,6 +221,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     useEffect(() => {
         resize();
+        getBiggestStr(axis);
         window.addEventListener('resize', (e) => {
             resize();
         });
@@ -213,6 +236,10 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         <svg id="graph" ref={svgElm} width={w} height={h}>
             {console.log('draw SvgChart')}
 
+            {/* Для вычисления высоты и ширины текста */}
+            <text x={0} y={50} className="note-text" ref={txtRef}>{bigestStr}</text>
+            {/* {setTextSize()} */}
+
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={1} h={6}
                 refX={0.5} refY={6}
@@ -224,14 +251,14 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
 
 
-            {renderPathAxis(rcClient, axis)}
+            {renderPathAxis(opt.rcClient, axis)}
 
             {
-                renderVTextAxis(rcClient, '_id', dataSets)
+                renderVTextAxis(opt.rcClient, '_id', dataSets)
 
             }
 
-            {renderHTextAxis(rcClient)}
+            {renderHTextAxis(opt.rcClient)}
 
             {
                 dataSets.map((itm, idx) => {
@@ -239,7 +266,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
                 })
             }
 
-            <ChartCursor svgElm={svgElm} rcClient={rcClient} lnSegX={lnHSeg} axis={axis} data={dataSets} />
+            <ChartCursor svgElm={svgElm} gObj={opt} axis={axis} data={dataSets} />
 
 
         </svg>
