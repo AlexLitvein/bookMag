@@ -20,7 +20,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             bottom: h - options.padding.bottom
         };
     }
-    
+
     opt.rcClient = _clientRect();
     let numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
     opt.lnHSeg = (opt.rcClient.right - opt.rcClient.left) / numHSeg;
@@ -32,7 +32,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     const svgElm = useRef(null);
     const txtRef = useRef(null);
-    const [bigestStr, setStr] = useState('');
+    // const [bigestStr, setStr] = useState('');
     const cut = (n) => Math.trunc(n) + 0.5; // trunc
 
     const _getOrthoPath = (x, y, size, numSeg, type) => {
@@ -55,24 +55,33 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         );
     }
 
-    const getBiggestStr = (axis) => {
-        let tmp = '';
-        for (const key in axis) {
-            let str = `${axis[key].name}: -304.5`;
-            tmp = str.length > tmp.length ? str : tmp;
-        }
-        setStr(tmp);
-    }
-
-    opt.setTextSize = () => {
-        let bbox = txtRef.current?.getBBox() || {width: 0, height:0};
+    const calcAvgSymW = () => {
+        let bbox = txtRef.current?.getBBox() || { width: 0, height: 0 };
+        opt.avgSymW = bbox.width / 27;
         opt.fontBBoxHeight = bbox.height;
-        opt.biggestDataStrBBoxWidth = bbox.width;
 
-        // console.log('setTextSize bbox', txtRef.current?.getBBox());
+        console.log('setTextSize avgSymW', opt.avgSymW);
+        console.log('setTextSize fontBBoxHeight', opt.fontBBoxHeight);
     }
 
-    
+    // const getBiggestStr = (axis) => {
+    //     let tmp = '';
+    //     for (const key in axis) {
+    //         let str = `${axis[key].name}: -304.5`;
+    //         tmp = str.length > tmp.length ? str : tmp;
+    //     }
+    //     setStr(tmp);
+    // }
+
+    // opt.setTextSize = () => {
+    //     let bbox = txtRef.current?.getBBox() || { width: 0, height: 0 };
+
+    //     opt.biggestDataStrBBoxWidth = bbox.width;
+    //     opt.fontBBoxHeight = bbox.height;
+    //     // console.log('setTextSize bbox', txtRef.current?.getBBox());
+    // }
+
+
 
     // data = [num1 , num2 , num3 , ...]
     const buildSvgAniPath = (rc, min, max, data) => {
@@ -107,6 +116,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }
 
     const renderVTextAxis = (rc, dataFieldText, arrDataSets) => {
+        let dx = options.fontBBoxHeight * 0.3;
         let arrStrs = arrDataSets.length !== 0 ? arrDataSets[0][dataFieldText] : [];
         arrStrs = arrStrs.map((el) => { // el = 2021-01-04T15:00:00.034Z
             // console.log(el);
@@ -114,7 +124,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             const dataStr = ('0' + data.getHours()).slice(-2) + '/' + ('0' + data.getDate()).slice(-2) + '/' + ('0' + (data.getMonth() + 1)).slice(-2) + '/' + data.getFullYear() % 100;
             return dataStr;
         });
-        return <TextGroup x={rc.left + (options.fontH / 2)} y={rc.bottom + (options.fontH / 2)} orient={'V'} offsX={opt.lnHSeg} offsY={0} texts={arrStrs} />;
+        return <TextGroup x={rc.left + dx} y={rc.bottom + dx} orient={'V'} offsX={opt.lnHSeg} offsY={0} texts={arrStrs} />;
     }
 
     const renderHTextAxle = (x, y, axle) => {
@@ -131,10 +141,10 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const renderHTextAxis = (rc) => {
         const res = [];
         let cntAxis = Object.keys(axis).length;
-        let dy = options.fontH;
+        let dy = options.fontBBoxHeight * 1;
         let startPos = rc.top - (cntAxis * dy / 2);
         for (const key in axis) {
-            res.push(renderHTextAxle(rc.left - (options.fontH / 2), startPos += dy, axis[key]));
+            res.push(renderHTextAxle(rc.left - dy/2, startPos += dy, axis[key]));
         }
         return res;
     }
@@ -221,7 +231,9 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     useEffect(() => {
         resize();
-        getBiggestStr(axis);
+        calcAvgSymW();
+        // getBiggestStr(axis);
+
         window.addEventListener('resize', (e) => {
             resize();
         });
@@ -237,8 +249,9 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {console.log('draw SvgChart')}
 
             {/* Для вычисления высоты и ширины текста */}
-            <text x={0} y={50} className="note-text" ref={txtRef}>{bigestStr}</text>
-            {/* {setTextSize()} */}
+            {/* <text x={0} y={50} className="note-text" ref={txtRef}>{bigestStr}</text> */}
+            <text x={0} y={-50} className="note-text" ref={txtRef}>aeiouybcdfghjklmnpqrstvwyzW</text>
+            {/* {calcAvgSymW()} */}
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={1} h={6}

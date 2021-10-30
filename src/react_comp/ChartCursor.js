@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 export function ChartCursor({ svgElm, gObj, axis, data }) {
     console.log("Call ChartCursor");
 
+    gObj.noteW = 0;
     const [_x, setX] = useState(gObj.rcClient.left);
     const [_y, setY] = useState(gObj.rcClient.top);
 
@@ -73,6 +74,10 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
                 // ({ min, max, cls, clrPath } = axis[key]);
                 let v1 = el[idxDataHit], v2 = el[idxDataHit + 1];
                 let str = `${axis[key].name}: ${aprox(v1, v2, gObj.lnHSeg, posInRange).toFixed(1)}`;
+
+                gObj.noteW = str.length * gObj.avgSymW > gObj.noteW ? str.length * gObj.avgSymW : gObj.noteW;
+
+                // console.log('gObj.noteW', gObj.noteW);
                 // bigestStr = Math.max(bigestStr.length, str.length);               
                 out.push(str);
             }
@@ -119,7 +124,7 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
             {console.log('draw ChartCursor')}
 
             {/* Нужно для установки размеров ОТРЕНДЕРЕНОЙ строки SVGTextElm */}
-            {gObj.setTextSize()}
+            {/* {gObj.setTextSize()} */}
 
             {/* <text x={0} y={-50} className="note-text" ref={txtRef}>{bigestStr}</text> */}
             <path d={`M${_x} ${gObj.rcClient.top}V${gObj.rcClient.bottom}`} className="cursor"></path>
@@ -131,10 +136,10 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
 export function FlyNote({ x, y, gObj, arrStr }) {
     // console.log('FlyNote gObj', gObj);
 
-    if (gObj.biggestDataStrBBoxWidth) {
+    if (gObj.noteW) {
         return (
             <>
-                <rect x={x} y={y} width={gObj.biggestDataStrBBoxWidth + 8} height={(arrStr.length + 0) * gObj.fontBBoxHeight} className="note" />
+                <rect x={x} y={y} width={gObj.noteW + 8} height={(arrStr.length + 0) * gObj.fontBBoxHeight} className="note" />
                 {arrStr.map((el, i) => {
                     // return <text x={x + 4} y={y + (bbox.height / 2) + (i + 0) * bbox.height} className="note-text">{el}  </text>;
                     return <text x={x + 4} y={y + (gObj.fontBBoxHeight * 0.7) + (i + 0) * gObj.fontBBoxHeight} className="note-text">{el}  </text>;
