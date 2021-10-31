@@ -1,7 +1,7 @@
 // import MyGraph from "../classes/ChartObject";
 
 export const GET_SENS_DATA = 'GET_SENS_DATA';
-export const SET_ANI_PATH = 'SET_ANI_PATH';
+export const SET_DATA_SET = 'SET_DATA_SET';
 // export const SET_PATH = 'SET_PATH';
 // export const SET_RESIZE_PATHS = 'SET_RESIZE_PATHS';
 export const SET_TEXT = 'SET_TEXT';
@@ -13,25 +13,12 @@ export const setText = (payload) => {
     }
 };
 
-export const setAniPath = (payload) => {
+export const setDataSet = (payload) => {
     return {
-        type: SET_ANI_PATH,
+        type: SET_DATA_SET,
         payload,
     }
 };
-
-// export const setPath = (payload) => {
-//     return {
-//         type: SET_PATH,
-//         payload,
-//     }
-// };
-
-// export const setResizePaths = () => {
-//     return {
-//         type: SET_RESIZE_PATHS,
-//     }
-// };
 
 export const getSensData = (payload,) => { // date, count, func
     console.log('act getSensData');
@@ -52,18 +39,14 @@ export const getSensData = (payload,) => { // date, count, func
 //      ...
 // ]
 const initialState = {
-    aniPaths: [],
-    // staticPaths: [],
-    // axis: {},
+    dataSets: [],
     text: { t1: 'text1', t2: 'text2' },
-    // text: ['text1', 'text2'],
 };
 
-export const selAniPaths = (state) => state.paths.aniPaths;
-// export const selStaticPaths = (state) => state.paths.staticPaths;
-export const selText = (state) => state.paths.text;
+export const selDataSets = (state) => state.chartData.dataSets;
+export const selText = (state) => state.chartData.text;
 
-export function pathRdcr(state = initialState, action) {
+export function dataSetsRdcr(state = initialState, action) {
     console.log('pathRdcr', action);
 
     switch (action.type) {
@@ -75,28 +58,12 @@ export function pathRdcr(state = initialState, action) {
                 // text: { ...state.text, ...action.payload },
             };
 
-        case SET_ANI_PATH:
+        case SET_DATA_SET:
             // console.log('action.SET_ANI_PATH:', state.aniPaths);           
             return {
                 ...state,
-                aniPaths: [...state.aniPaths, action.payload.pathData],
+                dataSets: [...state.dataSets, action.payload],
             };
-
-        // case SET_RESIZE_PATHS:
-        //     const res = [];
-        //     state.aniPaths.forEach((el) => { res.push(MyGraph.resizePaths(el)) });
-        //     // console.log('res', res);
-        //     return {
-        //         ...state,
-        //         aniPaths: [...res],
-        //     };
-
-        // case SET_PATH:
-        //     state.staticPaths.push();
-        //     return {
-        //         ...state,
-        //         staticPaths: [...state.staticPaths, action.payload.pathData],
-        //     };
 
         default:
             return state;
