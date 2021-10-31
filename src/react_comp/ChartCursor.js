@@ -5,12 +5,15 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
 
     gObj.noteW = 0;
     gObj.noteH = 0;
-    const [_x, setX] = useState(gObj.rcClient.left);
+    
+    const [_x, setX] = useState(gObj.rcClient.right);
     const [_y, setY] = useState(gObj.rcClient.top);
 
     const testPosX = (x) => {
         x = x < gObj.rcClient.left ? gObj.rcClient.left : x;
         x = x > gObj.rcClient.right ? gObj.rcClient.right : x;
+
+        console.log(`x ${x} gObj.rcClient.right ${gObj.rcClient.right} `);
         return x;
     }
     const testPosY = (y) => {
@@ -36,21 +39,33 @@ export function ChartCursor({ svgElm, gObj, axis, data }) {
 
         for (const key in obj) {
             const el = obj[key]; // [21.2, ...]
-            if (axis[key]) {
+            let v1 = el[idxDataHit];
+            let v2 = idxDataHit + 1 >= el.length ? el[idxDataHit] : el[idxDataHit + 1];
+            // console.log(`v1 ${v1} v2 ${v2} idxDataHit + 1 ${idxDataHit + 1}`);
 
-                if (axis[key].type === 'H') {
-                    continue;
-                }
-
-                let v1 = el[idxDataHit], v2 = el[idxDataHit + 1] || v1;
-                let str = `${axis[key].name}: ${aprox(v1, v2, gObj.lnHSeg, posInRange).toFixed(1)}`;
-
-                gObj.noteW = str.length * gObj.avgSymW > gObj.noteW ? str.length * gObj.avgSymW : gObj.noteW;
-                gObj.noteH += gObj.fontBBoxHeight;
-
-                // console.log('gObj.noteW', gObj.noteW);                     
-                out.push(str);
+            if (axis[key].type === 'H') {
+                v1 = Date.parse(v1);
+                v2 = Date.parse(v2);
             }
+
+            let apx = aprox(v1, v2, gObj.lnHSeg, posInRange);
+            let res = apx.toFixed(1);
+
+            if (axis[key].type === 'H') {
+                res = new Date(apx);
+                res =
+                    ('0' + res.getDate()).slice(-2) +
+                    '/' + ('0' + (res.getMonth() + 1)).slice(-2) +
+                    '/' + res.getFullYear() % 100 + " " +
+                    ('0' + res.getHours()).slice(-2) + ':' +
+                    ('0' + res.getMinutes()).slice(-2);
+            }
+
+            let str = `${axis[key].name}: ${res}`;
+            const sz = gObj.getStrBoundSize(str);
+            gObj.noteW = sz.width > gObj.noteW ? sz.width : gObj.noteW;
+            gObj.noteH += sz.height;
+            out.push({ clr: axis[key].clrPath, txt: str });
         }
         return out;
     }
@@ -97,9 +112,9 @@ export function FlyNote({ x, y, gObj, arrStr }) {
     function createRoundRect(x, y, w, h, r) {
         return (`
         M${x},${y} a${r},${r} 0 0,1 ${r},${-r} 
-        h${w-(r<<1)} a${r},${r} 0 0,1 ${r},${r}
-        v${h-r} a${r},${r} 0 0,1 ${-r},${r}
-        h${-w+(r<<1)} a${r},${r} 0 0,1 ${-r},${-r}z
+        h${w - (r << 1)} a${r},${r} 0 0,1 ${r},${r}
+        v${h - r} a${r},${r} 0 0,1 ${-r},${r}
+        h${-w + (r << 1)} a${r},${r} 0 0,1 ${-r},${-r}z
         `)
     }
 
@@ -113,7 +128,7 @@ export function FlyNote({ x, y, gObj, arrStr }) {
             <>
                 <path d={createRoundRect(pos.x, pos.y, gObj.noteW, gObj.noteH, 6)} className="note" />
                 {arrStr.map((el, i) => {
-                    return <text x={pos.x + 4} y={pos.y + (gObj.fontBBoxHeight * 0.7) + (i + 0) * gObj.fontBBoxHeight} className="note-text">{el}  </text>;
+                    return <text x={pos.x + 4} y={pos.y + (gObj.fontBBoxHeight * 0.7) + (i + 0) * gObj.fontBBoxHeight} className="note-text" fill={el.clr}>{el.txt}  </text>;
                 })
                 }
             </>

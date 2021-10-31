@@ -12,8 +12,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
 
-    // ширину линии использовать кратную 2 пикселям, координаты целочисоенные
-    const cut = (n) => Math.trunc(n);// + 0.5
+    // WARNING: ширину линии использовать кратную 2 пикселям, координаты целочисоенные
+    const cut = (n) => Math.trunc(n);
     const _clientRect = () => { // oreder!
         return {
             left: options.padding.left,
@@ -27,20 +27,17 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     opt.numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
     opt.lnHSeg = cut((opt.rcClient.right - opt.rcClient.left) / opt.numHSeg);
     let lnVSeg = cut((opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1));
-    // console.log(`lnSeg: ${lnSeg} w: ${w}`);
 
     let numMainVLine = 2;
     let numMainHLine = 2;
 
     const svgElm = useRef(null);
     const txtRef = useRef(null);
-    // const [bigestStr, setStr] = useState('');
-    
 
     const _getOrthoPath = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
         let pos = type === 'H' ? x : y;
-        let lnSeg = size / numSeg;
+        let lnSeg = cut(size / numSeg);
         for (let i = 1; i <= numSeg; i++) {
             d += type + cut(pos + lnSeg * i);
         }
@@ -50,20 +47,43 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const buildAxlePath = (rc, type) => {
         return _getOrthoPath(
             rc.left,
-            type === 'H' ? rc.bottom : rc.top,
+            // type === 'H' ? rc.bottom : rc.top,
+            type === 'H' ? rc.top + (lnVSeg * (options.countVLabels - 1)) : rc.top,
             type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
             type === 'H' ? opt.numHSeg : options.countVLabels - 1,
             type
         );
     }
 
-    const calcAvgSymW = () => {
-        let bbox = txtRef.current?.getBBox() || { width: 0, height: 0 };
-        opt.avgSymW = bbox.width / 27;
-        opt.fontBBoxHeight = bbox.height;
+    const calcPadding = () => {
+        let szHText = { width: 0, height: 0 };
+        let szVText = { width: 0, height: 0 };
+        for (const key in axis) {
+            const el = axis[key]; //_id: { name: 'Дата', min: 0, max: 0, type: 'H', cls: 'axis', clrPath: '#000ff00' },
 
-        console.log('setTextSize avgSymW', opt.avgSymW);
-        console.log('setTextSize fontBBoxHeight', opt.fontBBoxHeight);
+            if (el.type === 'H') {
+                if (dataSets.length !== 0) {
+                    let dataObj = dataSets[0];
+                    szHText = opt.getStrBoundSize(_formatDateStr(dataObj[key][0]));
+                }
+
+            } else {
+                const tmp = opt.getStrBoundSize(el.max);
+                szVText = tmp.width > szVText.width ? tmp : szVText;
+            }
+        }
+        console.log(`szHText ${szHText} szVText ${szVText}`);
+    }
+
+    opt.getStrBoundSize = (str) => {
+        let bbox = { width: 0, height: 0 };
+        if (txtRef.current) {
+            txtRef.current.innerHTML = str;
+            bbox = txtRef.current.getBBox();
+            // console.log('txtRef.current', txtRef.current);
+            opt.fontBBoxHeight = bbox.height;
+        }
+        return { width: bbox.width, height: bbox.height };
     }
 
     // data = [num1 , num2 , num3 , ...]
@@ -98,22 +118,35 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return out;
     }
 
+    const _formatDateStr = (str) => {
+        let data = new Date(str);
+        let dataStr = ('0' + data.getHours()).slice(-2) + '/' + ('0' + data.getDate()).slice(-2) + '/' + ('0' + (data.getMonth() + 1)).slice(-2) + '/' + data.getFullYear() % 100;
+        return dataStr;
+    }
+
     const renderVTextAxis = (rc, dataFieldText, arrDataSets) => {
-        let dx = options.fontBBoxHeight >> 2;
+        let dx = cut(options.fontBBoxHeight >> 2);
         let arrStrs = arrDataSets.length !== 0 ? arrDataSets[0][dataFieldText] : [];
-        arrStrs = arrStrs.map((el) => { // el = 2021-01-04T15:00:00.034Z
-            // console.log(el);
-            let data = new Date(el);
-            const dataStr = ('0' + data.getHours()).slice(-2) + '/' + ('0' + data.getDate()).slice(-2) + '/' + ('0' + (data.getMonth() + 1)).slice(-2) + '/' + data.getFullYear() % 100;
-            return dataStr;
+
+        const tmpStr = _formatDateStr(arrStrs[0]);
+        const sz = opt.getStrBoundSize(tmpStr);
+        opt.padding.bottom = Math.max(opt.padding.bottom, sz.width + options.axisTxtOffs * 2);
+
+        arrStrs = arrStrs.map((el) => { // el = 2021-01-04T15:00:00.034Z           
+            return _formatDateStr(el);
         });
-        return <TextGroup x={rc.left + dx} y={rc.bottom + dx} orient={'V'} offsX={opt.lnHSeg} offsY={0} texts={arrStrs} />;
+
+        return <TextGroup x={rc.left + dx} y={rc.bottom + options.axisTxtOffs} orient={'V'} offsX={opt.lnHSeg} offsY={0} texts={arrStrs} />;
     }
 
     const renderHTextAxle = (x, y, axle) => {
         const arrStrs = [];
         let delta = (Math.abs(axle.min) + axle.max) / (options.countVLabels - 1);
         arrStrs.push(axle.max);
+
+        const sz = opt.getStrBoundSize(axle.max);
+        opt.padding.left = Math.max(opt.padding.left, sz.width + options.axisTxtOffs * 2);
+
         for (let i = 1; i <= options.countVLabels - 2; i++) {
             arrStrs.push(axle.max - i * delta);
         }
@@ -124,13 +157,13 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const renderHTextAxis = (rc) => {
         const res = [];
         let cntAxis = Object.keys(axis).length - 1; // -1 тк первая ось горизонтальная
-        let dy = options.fontBBoxHeight * 1;
-        let startPos = rc.top - ((cntAxis * dy) / 2);
+        // let dy = options.fontBBoxHeight * 1;
+        let startPos = cut(rc.top - ((cntAxis * options.fontBBoxHeight) / 2) * 1.15);
         for (const key in axis) {
             if (axis[key].type === 'H') {
                 continue;
             }
-            res.push(renderHTextAxle(rc.left - dy / 2, startPos += dy, axis[key]));
+            res.push(renderHTextAxle(rc.left - options.axisTxtOffs, startPos += options.fontBBoxHeight, axis[key]));
         }
         return res;
     }
@@ -195,27 +228,20 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     useEffect(() => {
         resize();
-        calcAvgSymW();
-        // getBiggestStr(axis);
-
+        calcPadding();
         window.addEventListener('resize', (e) => {
             resize();
         });
-
-        // svgElm.current.addEventListener('click', (e) => {
-        //     console.log('click', e.clientX);
-        // });
-
     }, []); // componentDidMount()
 
     return (
         <svg id="graph" ref={svgElm} width={w} height={h}>
             {console.log('draw SvgChart')}
 
+            {/* {console.log('opt.rcClient before', opt.rcClient)} */}
+
             {/* Для вычисления высоты и ширины текста */}
-            {/* <text x={0} y={50} className="note-text" ref={txtRef}>{bigestStr}</text> */}
-            <text x={0} y={-70} className="note-text" ref={txtRef}>aeiouybcdfghjklmnpqrstvwyzW</text>
-            {/* {calcAvgSymW()} */}
+            <text x={0} y={-70} className="note-text" ref={txtRef}>1234567890aeiouybcdfghjklmnpqrstvwyzW</text>
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={2} h={6}
@@ -224,17 +250,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             />
 
             {renderMarkers()}
-
-
-
-
             {renderPathAxis(opt.rcClient, axis)}
-
-            {
-                renderVTextAxis(opt.rcClient, '_id', dataSets)
-
-            }
-
+            {renderVTextAxis(opt.rcClient, '_id', dataSets)}
             {renderHTextAxis(opt.rcClient)}
 
             {
@@ -245,7 +262,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             <ChartCursor svgElm={svgElm} gObj={opt} axis={axis} data={dataSets} />
 
-
+            {/* {console.log('opt.rcClient after', opt.rcClient)} */}
         </svg>
 
 

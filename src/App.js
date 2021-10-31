@@ -16,10 +16,10 @@ const axis = {
 const options = {
   padding: { top: 15, right: 10, bottom: 60, left: 30 },
   // fontH: 10, //?
-  countVLabels: 5,
+  countVLabels: 3,
+  axisTxtOffs: 8,
   // fontBBoxHeight: 0,
-  // biggestDataStrBBoxWidth: 0,
-  // avgSymW 27
+  // biggestDataStrBBoxWidth: 0,  
   // svgElm: null,
   // rcClient: null,
   // numHSeg: 0,

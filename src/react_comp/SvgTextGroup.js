@@ -8,8 +8,10 @@ export const TextGroup = ({ x, y, orient, offsX, offsY, texts, clr }) => {
         oy = offsX;
     }
     // console.log(`offsX: ${offsX} offsY: ${offsY}`);
+    // console.log("x ",x);
     return (
 
+       
         < g class="txt-axis" fill={clr} transform={`translate(${x}, ${y}) rotate(${angle})`
         }>
             {
