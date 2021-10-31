@@ -6,8 +6,6 @@ import { TextGroup } from "./SvgTextGroup";
 const SvgChart = ({ options, axis, dataSets = [] }) => {
     console.log('call SvgChart');
 
-    // TODO: resize padding
-
     let opt = options;
     const [w, setW] = useState(320);
     const [h, setH] = useState(320);
@@ -28,8 +26,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     opt.lnHSeg = cut((opt.rcClient.right - opt.rcClient.left) / opt.numHSeg);
     let lnVSeg = cut((opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1));
 
-    let numMainVLine = 2;
-    let numMainHLine = 2;
+    // let numMainVLine = 2;
+    // let numMainHLine = 2;
 
     const svgElm = useRef(null);
     const txtRef = useRef(null);
@@ -197,7 +195,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
             out.push(
                 <>
-                    <animate id="ani_p" begin="0s;indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
+                    <animate id={`ani_${key}`} begin="indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
                     <path
                         id={`data_${key}`}
                         className={'path-data'}
@@ -242,6 +240,15 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {/* Для вычисления высоты и ширины текста */}
             <text x={0} y={-70} className="note-text" ref={txtRef}>1234567890aeiouybcdfghjklmnpqrstvwyzW</text>
+
+            {/* <rect x="10" y="10" width="200" height="20" stroke="black" fill="none">
+                <animate id="animation" attributeName="width" attributeType="XML" from="200" to="20" begin="0s" dur="3s" repeatDur="indefinite" fill="freeze" />
+            </rect> */}
+
+<rect x="10" y="10" width="20" height="20" stroke="black" fill="none">
+                <animate id="animation" attributeName="width" attributeType="XML" values="20;10;20" begin="0s" dur="3s" repeatDur="indefinite" end = "ani_p.begin"   />
+            </rect>
+
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={2} h={6}

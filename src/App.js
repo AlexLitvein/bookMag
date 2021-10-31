@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
 import SvgChart from './react_comp/SvgChart';
-import { getSensData, selAniPaths } from './dataRdcrs/paths';
+import { getSensData, selDataSets } from './dataRdcrs/paths';
 
 const axis = {
   _id: { name: 'Дата', min: 0, max: 0, type: 'H', cls: 'axis', clrPath: '#000ff00' },
@@ -30,8 +30,22 @@ const options = {
 // TODO: перенести статус загрузки в pathRdcr
 function App() {
   const dispatch = useDispatch();
-  const aniPaths = useSelector(selAniPaths);
+  const dataSets = useSelector(selDataSets);
 
+
+  // NOTE! входные данные массив объектов, например: 
+  // [
+  //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+  //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+  //      { d: '2021-11-05', t: 21.2, p: 36.9, h: 12.5 },
+  // ]
+  // функция возвращает объект со свойствами массивами
+  // { 
+  //      _id: ['2021-11-05', ...], 
+  //      t: [21.2, ...],
+  //      p: [36.9 ...],
+  //      h: [12.5 ...]
+  // }
   const convertArrObjectsToObjectPropertyArrays = (arrObjects) => {
     const out = {};
     if (arrObjects.length !== 0) {
@@ -69,7 +83,7 @@ function App() {
         <button id="btn_dec" type="button">-H</button>
       </div>
       <div className="wrpSvg">
-        <SvgChart options={options} axis={axis} dataSets={aniPaths} />
+        <SvgChart options={options} axis={axis} dataSets={dataSets} />
       </div>
 
     </div>
