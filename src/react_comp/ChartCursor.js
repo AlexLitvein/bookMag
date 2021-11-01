@@ -128,7 +128,7 @@ export function FlyNote({ x, y, options, arrStr }) {
             <>
                 <path d={createRoundRect(pos.x, pos.y, options.noteW+options.axisTxtOffs, options.noteH, 6)} className="note" />
                 {arrStr.map((el, i) => {
-                    return <text x={pos.x + 4} y={pos.y + (options.fontBBoxHeight * 0.7) + (i + 0) * options.fontBBoxHeight} className="note-text" fill={el.clr}>{el.txt}  </text>;
+                    return <text key={i} x={pos.x + 4} y={pos.y + (options.fontBBoxHeight * 0.7) + (i + 0) * options.fontBBoxHeight} className="note-text" fill={el.clr}>{el.txt}  </text>;
                 })
                 }
             </>

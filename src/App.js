@@ -66,12 +66,12 @@ function App() {
   useEffect(() => {
     dispatch(getSensData({ date: 0, count: 0, func: convertArrObjectsToObjectPropertyArrays }));
 
-    document.getElementById('btnstart').addEventListener('click', (e) => {
-      const els = document.getElementsByTagName('animate'); // 
-      for (let i = 0; i < els.length; i++) {
-        els[i].beginElement();
-      }
-    });
+    // document.getElementById('btnstart').addEventListener('click', (e) => {
+    //   const els = document.getElementsByTagName('animate'); // 
+    //   for (let i = 0; i < els.length; i++) {
+    //     els[i].beginElement();
+    //   }
+    // });
 
   }, []); // componentDidMount()
 

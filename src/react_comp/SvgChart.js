@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChartCursor } from "./ChartCursor";
-import { Axle, SvgMarker } from "./SvgComps";
+import { AniPath, Axle, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
 const SvgChart = ({ options, axis, dataSets = [] }) => {
@@ -31,6 +31,11 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     const svgElm = useRef(null);
     const txtRef = useRef(null);
+    const aniSetDataEl = useRef(null);
+
+    if(dataSets.length !== 0){
+        aniSetDataEl.current.beginElement();
+    }
 
     const _getOrthoPath = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
@@ -194,15 +199,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             ({ min, max, clrPath } = axis[key]);
             const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
             out.push(
-                <>
-                    <animate id={`ani_${key}`} begin="indefinite" xlinkHref={`#data_${key}`} attributeName="d" dur="0.5" fill="freeze" to={res.to} />
-                    <path
-                        id={`data_${key}`}
-                        className={'path-data'}
-                        style={{ stroke: clrPath, marker: `url("#mrk_${key}")` }}
-                        d={res.do}>
-                    </path>
-                </>
+                <AniPath key={key} pref={key} cls={'path-data'} d={res.do} to={res.to} clrPath={clrPath} />
             );
         }
         return out;
@@ -224,6 +221,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return out;
     }
 
+
+
     useEffect(() => {
         resize();
         // calcPadding();
@@ -238,15 +237,19 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {/* {console.log('opt.rcClient before', opt.rcClient)} */}
 
+            <path d="M0 -10h1">
+                <animate id="ani_set_data" ref={aniSetDataEl} begin="0s" attributeName="d" dur="0.5" to="M0 0h2" />
+            </path>
+
             {/* Для вычисления высоты и ширины текста */}
-            <text x={0} y={-70} className="note-text" ref={txtRef}>1234567890aeiouybcdfghjklmnpqrstvwyzW</text>
+            <text x={0} y={-10} className="note-text" ref={txtRef}>1234567890aeiouybcdfghjklmnpqrstvwyzW</text>
 
             {/* <rect x="10" y="10" width="200" height="20" stroke="black" fill="none">
                 <animate id="animation" attributeName="width" attributeType="XML" from="200" to="20" begin="0s" dur="3s" repeatDur="indefinite" fill="freeze" />
             </rect> */}
 
-<rect x="10" y="10" width="20" height="20" stroke="black" fill="none">
-                <animate id="animation" attributeName="width" attributeType="XML" values="20;10;20" begin="0s" dur="3s" repeatDur="indefinite" end = "ani_p.begin"   />
+            <rect x="10" y="10" width="20" height="20" stroke="black" fill="none">
+                <animate id="animation" attributeName="width" attributeType="XML" values="20;10;20" begin="0s" dur="3s" repeatDur="indefinite" end="ani_p.begin" />
             </rect>
 
 
