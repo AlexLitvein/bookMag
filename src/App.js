@@ -1,8 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
 import SvgChart from './react_comp/SvgChart';
 import { getSensData, selDataSets } from './dataRdcrs/paths';
+
+import TextField from '@mui/material/TextField';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePicker from '@mui/lab/DatePicker';
+import ruLocale from 'date-fns/locale/ru';
+
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Button from '@mui/material/Button';
+
+// import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+// import {DatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
+// import AdapterDateFns from '@date-io/date-fns';
+
+// const localeMap = {
+
+//   ru: ruLocale,
+// };
 
 const axis = {
   _id: { name: 'Дата', min: 0, max: 0, type: 'H', cls: 'axis', clrPath: '#000ff00' },
@@ -14,7 +34,7 @@ const axis = {
 // const marker
 
 const options = {
-  padding: { top: 15, right: 10, bottom: 60, left: 30 },
+  padding: { top: 20, right: 10, bottom: 60, left: 30 },
   // fontH: 10, //?
   countVLabels: 3,
   axisTxtOffs: 8,
@@ -23,14 +43,53 @@ const options = {
   // svgElm: null,
   // rcClient: null,
   // numHSeg: 0,
-  // lnHSeg: 0,
+  // lnHSeg: 0, 
   // lnVSeg: 0,
 };
+
+function requestSensDataUrlencoded(data, range) {
+  // if (document.forms[0].checkValidity()) {
+  const body = 'startData=' + encodeURIComponent(data) +
+    '&range=' + encodeURIComponent(range);
+  const xhr = new XMLHttpRequest();
+  xhr.timeout = 3000; // (в миллисекундах)
+  xhr.open('POST', '/weather/getSensData', true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.send(body);
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+      // mArrDbData = JSON.parse(this.responseText);
+      //if (mArrDbData.length !== 0) {
+      //console.log('m_arrDbData len: %d', mArrDbData.length);
+
+      // Draw();
+      // mGraph.drawGraph(mArrDbData, parseInt(range));
+      //}
+    }
+  }
+  // }
+}
+
+function fetchJson(url) {
+  return fetch(url)
+    .then(request => request.text())
+    .then(text => {
+      return JSON.parse(text);
+    })
+    .catch(error => {
+      console.log();
+    });
+}
 
 // TODO: перенести статус загрузки в pathRdcr
 function App() {
   const dispatch = useDispatch();
   const dataSets = useSelector(selDataSets);
+
+
+  const [date, setDate] = useState(Date.now());//1635839818003
+  const [range, setRange] = useState(2);
 
 
   // NOTE! входные данные массив объектов, например: 
@@ -63,24 +122,73 @@ function App() {
     return out;
   }
 
+  const fetchDataRange = (date, range) => {
+    // console.log(date);
+    dispatch(getSensData({ date: new Date(date).getDate() - 1, range: range, func: convertArrObjectsToObjectPropertyArrays }));
+  }
+
+  const addDateDay = (date, add) => {
+    const dt = new Date(date);
+    dt.setDate(dt.getDate() + add);
+    return dt;
+  }
+
+  const onSetDate = (date, add = 0) => {
+    setDate(date);
+    fetchDataRange(date, range);
+  }
+
+  const onSetRange = (range) => {
+    setRange(range);
+    fetchDataRange(date, range);
+  }
+
+  const onAddDate = (add) => {
+    setDate((prev) => {
+      const res = addDateDay(prev, add);
+      fetchDataRange(res, range);
+      return res;
+    });
+  }
+
+
+
   useEffect(() => {
-    dispatch(getSensData({ date: 0, count: 0, func: convertArrObjectsToObjectPropertyArrays }));
-
-    // document.getElementById('btnstart').addEventListener('click', (e) => {
-    //   const els = document.getElementsByTagName('animate'); // 
-    //   for (let i = 0; i < els.length; i++) {
-    //     els[i].beginElement();
-    //   }
-    // });
-
+    console.log("App useEffect");
+    fetchDataRange(date, range);
   }, []); // componentDidMount()
 
   return (
     <div className="App">
       <div id="controls">
-        <button id="btnstart" type="button">Start</button>
-        <button id="btn_inc" type="button">+H</button>
-        <button id="btn_dec" type="button">-H</button>
+
+        <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
+          <DatePicker
+            mask={'__.__.____'}
+            label="Basic example"
+            value={date}
+            onChange={(newVal) => onSetDate(newVal)}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+
+        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+          <Button onClick={(e) => onAddDate(-1)} >One</Button>         
+          <Button onClick={(e) => onAddDate(1)} >Two</Button>
+        </ButtonGroup>
+
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={range}
+          label="Age"
+          onChange={(e) => onSetRange(e.target.value)}
+        >
+          <MenuItem value={2}>2</MenuItem>
+          <MenuItem value={5}>5</MenuItem>
+          <MenuItem value={10}>10</MenuItem>
+        </Select>
+
       </div>
       <div className="wrpSvg">
         <SvgChart options={options} axis={axis} dataSets={dataSets} />

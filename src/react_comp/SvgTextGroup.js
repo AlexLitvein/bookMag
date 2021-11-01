@@ -12,11 +12,11 @@ export const TextGroup = ({ x, y, orient, offsX, offsY, texts, clr }) => {
     return (
 
        
-        < g class="txt-axis" fill={clr} transform={`translate(${x}, ${y}) rotate(${angle})`
+        < g className="txt-axis" fill={clr} transform={`translate(${x}, ${y}) rotate(${angle})`
         }>
             {
                 texts.map((el, i) => {
-                    return (<TextSvg x={ox * i} y={oy * i} text={el} />);
+                    return (<TextSvg key={i} x={ox * i} y={oy * i} text={el} />);
                 })
             }
         </g >

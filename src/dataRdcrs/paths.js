@@ -62,7 +62,8 @@ export function dataSetsRdcr(state = initialState, action) {
             // console.log('action.SET_ANI_PATH:', state.aniPaths);           
             return {
                 ...state,
-                dataSets: [...state.dataSets, action.payload],
+                // dataSets: [...state.dataSets, action.payload],
+                dataSets: [action.payload],
             };
 
         default:

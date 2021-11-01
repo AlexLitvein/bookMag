@@ -5,7 +5,7 @@ export function ChartCursor({ svgElm, options, axis, data }) {
 
     options.noteW = 0;
     options.noteH = 0;
-    
+
     const [_x, setX] = useState(options.rcClient.right);
     const [_y, setY] = useState(options.rcClient.top);
 
@@ -13,7 +13,7 @@ export function ChartCursor({ svgElm, options, axis, data }) {
         x = x < options.rcClient.left ? options.rcClient.left : x;
         x = x > options.rcClient.right ? options.rcClient.right : x;
 
-        console.log(`x ${x} gObj.rcClient.right ${options.rcClient.right} `);
+        // console.log(`x ${x} options.rcClient.bottom ${options.rcClient.bottom} `);
         return x;
     }
     const testPosY = (y) => {
@@ -63,10 +63,11 @@ export function ChartCursor({ svgElm, options, axis, data }) {
 
             let str = `${axis[key].name}: ${res}`;
             const sz = options.getStrBoundSize(str);
-            options.noteW = sz.width > options.noteW ? sz.width : options.noteW;
+            options.noteW = sz.width > options.noteW ? sz.width + options.axisTxtOffs : options.noteW;
             options.noteH += sz.height;
             out.push({ clr: axis[key].clrPath, txt: str });
         }
+
         return out;
     }
 
@@ -126,7 +127,7 @@ export function FlyNote({ x, y, options, arrStr }) {
     if (options.noteW) {
         return (
             <>
-                <path d={createRoundRect(pos.x, pos.y, options.noteW+options.axisTxtOffs, options.noteH, 6)} className="note" />
+                <path d={createRoundRect(pos.x, pos.y, options.noteW, options.noteH, 6)} className="note" />
                 {arrStr.map((el, i) => {
                     return <text key={i} x={pos.x + 4} y={pos.y + (options.fontBBoxHeight * 0.7) + (i + 0) * options.fontBBoxHeight} className="note-text" fill={el.clr}>{el.txt}  </text>;
                 })

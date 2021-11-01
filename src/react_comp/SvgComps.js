@@ -1,36 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 export const AniPath = ({ pref, cls, d, to, clrPath }) => {
+    console.log("AniPath", pref);
 
-    const [pD, setPD] = useState('');
-    const [pTo, setPTo] = useState('');
+    const [td, setTD] = useState({ t: "", d: "", });
 
     useEffect(() => {
-        // console.log(`AniPath useEffect ${x} ${y}`);
+        console.log(`AniPath useEffect `);
 
-        if (pD.length === 0 || pD.length !== to.length) {
-            setPD(d);            
-        } else {
-            setPD(pTo);
-        }
-        setPTo(to);
-    });
+        setTD((prev) => {
+            console.log('prev', prev);
+            const res = {};
+            if (prev.d.length === 0 || prev.d.length !== to.length) {
+                res.d = d;
+            } else {
+                res.d = prev.t;
+            }
+            res.t = to;
+            console.log('AniPath res', res);
+            return res;
+        });
+
+    }, [to, d]);
 
     return (
         <path
             className={cls}
             style={{ stroke: clrPath, marker: `url("#mrk_${pref}")` }}
-            d={pD}>
-            <animate id={`ani_${pref}`} begin="ani_set_data.begin" attributeName="d" dur="0.5" fill="freeze" to={pTo} />
+            // d={pD}>
+            d={td.d}>
+            <animate id={`ani_${pref}`} begin="ani_set_data.begin" attributeName="d" dur="0.5" fill="freeze" to={td.t} />
         </path>
     );
 }
 
 export function Axle({ d, cls }) {
-    // console.log(`create Axis arguments:`, arguments);// ${x} ${y}
     return (
-        <path d={d} class={cls} ></path>
-        // <path d={d} {...props}></path>
+        <path d={d} className={cls} ></path>
     );
 }
 
@@ -50,6 +56,3 @@ export const SvgMarker = ({ id, cls, w, h, refX, refY, mrkEl }) => {
         </defs>
     );
 }
-
-
-// export { Axle, TextSvg }; // Marker, 

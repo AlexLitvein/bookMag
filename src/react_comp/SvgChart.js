@@ -1,46 +1,45 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { ChartCursor } from "./ChartCursor";
 import { AniPath, Axle, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
 const SvgChart = ({ options, axis, dataSets = [] }) => {
-    console.log('call SvgChart');
+    console.log('call SvgChart', dataSets);
 
     let opt = options;
-    const [w, setW] = useState(320);
-    const [h, setH] = useState(320);
 
-    // WARNING: ширину линии использовать кратную 2 пикселям, координаты целочисоенные
-    const cut = (n) => Math.trunc(n);
-    const _clientRect = () => { // oreder!
-        return {
-            left: options.padding.left,
-            top: options.padding.top,
-            right: w - options.padding.right,
-            bottom: h - options.padding.bottom
-        };
-    }
-
-    opt.rcClient = _clientRect();
-    opt.numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
-    opt.lnHSeg = cut((opt.rcClient.right - opt.rcClient.left) / opt.numHSeg);
-    let lnVSeg = cut((opt.rcClient.bottom - opt.rcClient.top) / (options.countVLabels - 1));
-
-    // let numMainVLine = 2;
-    // let numMainHLine = 2;
-
+    const [sz, setSize] = useState({ w: 320, h: 320, });
     const svgElm = useRef(null);
     const txtRef = useRef(null);
     const aniSetDataEl = useRef(null);
 
-    if(dataSets.length !== 0){
-        aniSetDataEl.current.beginElement();
+    // WARNING: ширину линии использовать кратную 2 пикселям, координаты целочисоенные
+    const cut = (n) => Math.trunc(n);
+
+    const _clientRect = () => { // oreder!
+        return {
+            left: options.padding.left,
+            top: options.padding.top,
+            right: sz.w - options.padding.right,
+            bottom: sz.h - options.padding.bottom
+        };
     }
+
+    opt.numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
+    opt.lnHSeg = (sz.w - options.padding.left - options.padding.right) / opt.numHSeg;
+    opt.lnVSeg = (sz.h - options.padding.top - options.padding.bottom) / (options.countVLabels - 1);
+    opt.rcClient = _clientRect();
+
+
+
+    // if (dataSets.length !== 0) {
+    //     aniSetDataEl.current.beginElement();
+    // }
 
     const _getOrthoPath = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
         let pos = type === 'H' ? x : y;
-        let lnSeg = cut(size / numSeg);
+        let lnSeg = size / numSeg;
         for (let i = 1; i <= numSeg; i++) {
             d += type + cut(pos + lnSeg * i);
         }
@@ -50,8 +49,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const buildAxlePath = (rc, type) => {
         return _getOrthoPath(
             rc.left,
-            // type === 'H' ? rc.bottom : rc.top,
-            type === 'H' ? rc.top + (lnVSeg * (options.countVLabels - 1)) : rc.top,
+            type === 'H' ? rc.top + (opt.lnVSeg * (options.countVLabels - 1)) : rc.top,
             type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
             type === 'H' ? opt.numHSeg : options.countVLabels - 1,
             type
@@ -86,7 +84,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             // console.log('txtRef.current', txtRef.current);
             opt.fontBBoxHeight = bbox.height;
         }
-        return { width: bbox.width, height: bbox.height };
+        return { width: cut(bbox.width), height: cut(bbox.height) };
     }
 
     // data = [num1 , num2 , num3 , ...]
@@ -99,8 +97,11 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         for (let i = 0; i < data.length; i++) {
             val = data[i];
             val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
-            res.do += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom)}`;
-            res.to += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom - val)}`;
+            // res.do += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom)}`;
+            // res.to += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom - val)}`;
+
+            res.do += `${rc.left + opt.lnHSeg * i} ${rc.bottom}`;
+            res.to += `${rc.left + opt.lnHSeg * i} ${rc.bottom - val}`;
 
             if (i < data.length - 1) {
                 res.do += 'L';
@@ -111,11 +112,12 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }
 
     const renderPathAxis = (rc, axis) => {
+        console.log("renderPathAxis");
         const out = [];
         for (const key in axis) {
             const el = axis[key];
             out.push(
-                <Axle d={buildAxlePath(rc, el.type)} cls={el.cls} />
+                <Axle key={key} d={buildAxlePath(rc, el.type)} cls={el.cls} />
             );
         }
         return out;
@@ -139,7 +141,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             return _formatDateStr(el);
         });
 
-        return <TextGroup x={rc.left + dx} y={rc.bottom + options.axisTxtOffs} orient={'V'} offsX={opt.lnHSeg} offsY={0} texts={arrStrs} />;
+        return <TextGroup x={rc.left + dx} y={rc.bottom + options.axisTxtOffs} orient={'V'} offsX={cut(opt.lnHSeg)} offsY={0} texts={arrStrs} />;
     }
 
     const renderHTextAxle = (x, y, axle) => {
@@ -154,7 +156,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             arrStrs.push(axle.max - i * delta);
         }
         arrStrs.push(axle.min);
-        return <TextGroup x={x} y={y} orient={'H'} offsX={0} offsY={lnVSeg} texts={arrStrs} clr={axle.clrPath} />;
+        return <TextGroup  key={axle.name} x={x} y={y} orient={'H'} offsX={0} offsY={opt.lnVSeg} texts={arrStrs} clr={axle.clrPath} />;
     }
 
     const renderHTextAxis = (rc) => {
@@ -174,8 +176,9 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     function resize() {
         let { width, height } = svgElm.current.parentElement.getBoundingClientRect();
         // возвращаются float коорд
-        setW(cut(width));
-        setH(cut(height));
+        // setW(cut(width));
+        // setH(cut(height));
+        setSize({ w: cut(width), h: cut(height), })
 
         // console.log('resize height', height);
     }
@@ -188,7 +191,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     //      p:   [36.9 ...],
     //      h:   [12.5 ...]
     // }
-    const renderDataSet = (obj) => {
+    const renderDataSet = (obj, preId) => {
+        console.log("renderDataSet");
         const out = [];
         let min = 0, max = 0, clrPath = '';
         for (const key in obj) {
@@ -199,18 +203,28 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             ({ min, max, clrPath } = axis[key]);
             const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
             out.push(
-                <AniPath key={key} pref={key} cls={'path-data'} d={res.do} to={res.to} clrPath={clrPath} />
+                <AniPath key={key + preId} pref={key} cls={'path-data'} d={res.do} to={res.to} clrPath={clrPath} />
             );
         }
         return out;
     }
+
+    // const renderDataSets = () => {
+    //     const out = dataSets.map((itm, idx) => {
+    //         return renderDataSet(itm);
+    //     });
+
+    //     // aniSetDataEl.current?.beginElement();
+
+    //     return out;
+    // }
 
     const renderMarkers = () => {
         const out = [];
         for (const key in axis) {
             const el = axis[key];
             out.push(
-                <SvgMarker id={`mrk_${key}`}
+                <SvgMarker key={key} id={`mrk_${key}`}
                     cls={`mrk_${key}`}
                     w={8} h={8}
                     refX={4} refY={4}
@@ -221,9 +235,24 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return out;
     }
 
+    const renderedDataSet = useMemo(() => {
+        // const out = [];
+        console.log("useMemo");
 
+        // aniSetDataEl?.current.beginElement();
+
+        return dataSets.map((itm, idx) => {
+            return renderDataSet(itm, idx);
+        });
+
+        // return renderDataSets();
+    }, [dataSets, sz]);
+
+    useEffect(() => { aniSetDataEl.current?.beginElement(); }, [dataSets]);
 
     useEffect(() => {
+        console.log("SvgChart useEffect");
+
         resize();
         // calcPadding();
         window.addEventListener('resize', (e) => {
@@ -232,7 +261,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     }, []); // componentDidMount()
 
     return (
-        <svg id="graph" ref={svgElm} width={w} height={h}>
+        <svg id="graph" ref={svgElm} width={sz.w} height={sz.h}>
             {console.log('draw SvgChart')}
 
             {/* {console.log('opt.rcClient before', opt.rcClient)} */}
@@ -244,14 +273,9 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {/* Для вычисления высоты и ширины текста */}
             <text x={0} y={-10} className="note-text" ref={txtRef}>1234567890aeiouybcdfghjklmnpqrstvwyzW</text>
 
-            {/* <rect x="10" y="10" width="200" height="20" stroke="black" fill="none">
-                <animate id="animation" attributeName="width" attributeType="XML" from="200" to="20" begin="0s" dur="3s" repeatDur="indefinite" fill="freeze" />
-            </rect> */}
-
             <rect x="10" y="10" width="20" height="20" stroke="black" fill="none">
                 <animate id="animation" attributeName="width" attributeType="XML" values="20;10;20" begin="0s" dur="3s" repeatDur="indefinite" end="ani_p.begin" />
             </rect>
-
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={2} h={6}
@@ -264,13 +288,18 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {renderVTextAxis(opt.rcClient, '_id', dataSets)}
             {renderHTextAxis(opt.rcClient)}
 
-            {
+            {/* {
                 dataSets.map((itm, idx) => {
                     return renderDataSet(itm);
                 })
-            }
+            } */}
+
+            {/* {console.log('renderedDataSet', renderedDataSet)} */}
+
+            {renderedDataSet}
 
             <ChartCursor svgElm={svgElm} options={opt} axis={axis} data={dataSets} />
+
 
             {/* {console.log('opt.rcClient after', opt.rcClient)} */}
         </svg>

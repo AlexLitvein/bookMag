@@ -16,14 +16,15 @@ const sagaMiddleware = createSagaMiddleware();
 const MyStore = createStore(rootReducer, composeEnhancers(applyMiddleware(sagaMiddleware)));
 
 function* fetchSensData(act) { // act = { date, count, func }
-    console.log('fetchSensData', act);
+    // console.log('fetchSensData', act);
     try {
-        yield put(setLoading());
-        const receivedData = yield remote_data[0];
+        // yield put(setLoading());
+        const receivedData = yield remote_data[act.payload.date].slice(0,act.payload.range);
+        // console.log('receivedData', receivedData);
         const data = yield call(act.payload.func, receivedData);
-        yield delay(1000);
+        yield delay(500);
         yield put(setDataSet( data )); //{ data }
-        yield put(setLoaded());
+        // yield put(setLoaded());
     } catch (e) {
         yield put(setError(e.message));
     }
