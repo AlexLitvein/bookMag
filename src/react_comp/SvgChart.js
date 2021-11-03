@@ -36,7 +36,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     //     aniSetDataEl.current.beginElement();
     // }
 
-    const _getOrthoPath = (x, y, size, numSeg, type) => {
+    options.getOrthoLine = (x, y, size, numSeg, type) => {
         let d = `M${cut(x)} ${cut(y)}`;
         let pos = type === 'H' ? x : y;
         let lnSeg = size / numSeg;
@@ -46,8 +46,34 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return d;
     }
 
+    options.getOrthoPath = (x, y, size, numSeg, type) => {
+        let d = 'M';
+        let posX = type === 'H' ? x : y;
+        let posY = type === 'H' ? y : x;
+        let lnSeg = size / numSeg;
+        for (let i = 0; i <= numSeg; i++) {
+            // d += type + cut(pos + lnSeg * i);
+            d += `${cut(posX + lnSeg * i)} ${posY}`;
+            if (i < numSeg) { d += 'L'; }
+        }
+        return d;
+    }
+
+    // options.getOrthoPath = (x, y, size, numSeg, type) => {
+    //     let d = `M${cut(x)} ${cut(y)}`;
+    //     let posX = type === 'H' ? x : y;
+    //     let posY = type === 'H' ? y : x;
+    //     let lnSeg = size / numSeg;
+    //     for (let i = 1; i <= numSeg; i++) {
+    //         // d += type + cut(pos + lnSeg * i);
+    //         d += `${cut(posX + lnSeg * i)} ${posY}`;
+    //         if (i < numSeg - 1) { d += 'L'; }
+    //     }
+    //     return d;
+    // }
+
     const buildAxlePath = (rc, type) => {
-        return _getOrthoPath(
+        return options.getOrthoLine(
             rc.left,
             type === 'H' ? rc.top + (opt.lnVSeg * (options.countVLabels - 1)) : rc.top,
             type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
@@ -87,29 +113,29 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return { width: cut(bbox.width), height: cut(bbox.height) };
     }
 
-    // data = [num1 , num2 , num3 , ...]
-    const buildSvgAniPath = (rc, min, max, data) => {
-        // const rc = clientRect();
-        let val = 0;
-        // let lnSeg = (rc.right - rc.left) / (data.length - 1);
-        let res = { do: 'M', to: 'M' };
+    // // data = [num1 , num2 , num3 , ...]
+    // const buildSvgAniPath = (rc, min, max, data) => {
+    //     // const rc = clientRect();
+    //     let val = 0;
+    //     // let lnSeg = (rc.right - rc.left) / (data.length - 1);
+    //     let res = { do: 'M', to: 'M' };
 
-        for (let i = 0; i < data.length; i++) {
-            val = data[i];
-            val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
-            // res.do += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom)}`;
-            // res.to += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom - val)}`;
+    //     for (let i = 0; i < data.length; i++) {
+    //         val = data[i];
+    //         val = Math.round(((val - min) / (max - min)) * (rc.bottom - rc.top));
+    //         // res.do += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom)}`;
+    //         // res.to += `${cut(rc.left + opt.lnHSeg * i)} ${cut(rc.bottom - val)}`;
 
-            res.do += `${rc.left + opt.lnHSeg * i} ${rc.bottom}`;
-            res.to += `${rc.left + opt.lnHSeg * i} ${rc.bottom - val}`;
+    //         res.do += `${rc.left + opt.lnHSeg * i} ${rc.bottom}`;
+    //         res.to += `${rc.left + opt.lnHSeg * i} ${rc.bottom - val}`;
 
-            if (i < data.length - 1) {
-                res.do += 'L';
-                res.to += 'L';
-            }
-        }
-        return res;
-    }
+    //         if (i < data.length - 1) {
+    //             res.do += 'L';
+    //             res.to += 'L';
+    //         }
+    //     }
+    //     return res;
+    // }
 
     const renderPathAxis = (rc, axis) => {
         console.log("renderPathAxis");
@@ -156,7 +182,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             arrStrs.push(axle.max - i * delta);
         }
         arrStrs.push(axle.min);
-        return <TextGroup  key={axle.name} x={x} y={y} orient={'H'} offsX={0} offsY={opt.lnVSeg} texts={arrStrs} clr={axle.clrPath} />;
+        return <TextGroup key={axle.name} x={x} y={y} orient={'H'} offsX={0} offsY={opt.lnVSeg} texts={arrStrs} clr={axle.clrPath} />;
     }
 
     const renderHTextAxis = (rc) => {
@@ -191,23 +217,46 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     //      p:   [36.9 ...],
     //      h:   [12.5 ...]
     // }
-    const renderDataSet = (obj, preId) => {
+    const renderDataSet = (obj, idx) => {
         console.log("renderDataSet");
         const out = [];
-        let min = 0, max = 0, clrPath = '';
         for (const key in obj) {
             const el = obj[key]; // [21.2, ...]
             if (axis[key].type === 'H') {
                 continue;
             }
-            ({ min, max, clrPath } = axis[key]);
-            const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
             out.push(
-                <AniPath key={key + preId} pref={key} cls={'path-data'} d={res.do} to={res.to} clrPath={clrPath} />
+                <AniPath key={key + idx} id={key} options={options} axle={axis[key]} data={el} />
             );
         }
         return out;
     }
+
+    // ===========================
+    // input
+    // { 
+    //      _id: ['2021-11-05', ...], 
+    //      t:   [21.2, ...],
+    //      p:   [36.9 ...],
+    //      h:   [12.5 ...]
+    // }
+    // const renderDataSet = (obj, preId) => {
+    //     console.log("renderDataSet");
+    //     const out = [];
+    //     let min = 0, max = 0, clrPath = '';
+    //     for (const key in obj) {
+    //         const el = obj[key]; // [21.2, ...]
+    //         if (axis[key].type === 'H') {
+    //             continue;
+    //         }
+    //         ({ min, max, clrPath } = axis[key]);
+    //         const res = { ...buildSvgAniPath(opt.rcClient, min, max, el) };
+    //         out.push(
+    //             <AniPath key={key + preId} pref={key} cls={'path-data'} d={res.do} to={res.to} clrPath={clrPath} />
+    //         );
+    //     }
+    //     return out;
+    // }
 
     // const renderDataSets = () => {
     //     const out = dataSets.map((itm, idx) => {
