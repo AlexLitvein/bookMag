@@ -89,7 +89,7 @@ function App() {
 
 
   const [date, setDate] = useState(Date.now());//1635839818003
-  const [range, setRange] = useState(2);
+  const [range, setRange] = useState(24);
 
 
   // NOTE! входные данные массив объектов, например: 
@@ -124,7 +124,7 @@ function App() {
 
   const fetchDataRange = (date, range) => {
     // console.log(date);
-    dispatch(getSensData({ date: new Date(date).getDate() - 1, range: range, func: convertArrObjectsToObjectPropertyArrays }));
+    dispatch(getSensData({ date: 0, range: range, func: convertArrObjectsToObjectPropertyArrays }));//new Date(date).getDate() - 1
   }
 
   const addDateDay = (date, add) => {
@@ -184,9 +184,9 @@ function App() {
           label="Age"
           onChange={(e) => onSetRange(e.target.value)}
         >
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={5}>5</MenuItem>
-          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={1*24}>1*24</MenuItem>
+          <MenuItem value={10*24}>10*24</MenuItem>
+          <MenuItem value={30*24}>30*24</MenuItem>
         </Select>
 
       </div>
