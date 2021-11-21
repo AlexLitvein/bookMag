@@ -47,7 +47,7 @@ export const selDataSets = (state) => state.chartData.dataSets;
 export const selText = (state) => state.chartData.text;
 
 export function dataSetsRdcr(state = initialState, action) {
-    console.log('pathRdcr', action);
+    // console.log('pathRdcr', action);
 
     switch (action.type) {
         case SET_TEXT:

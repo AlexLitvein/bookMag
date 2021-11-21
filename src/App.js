@@ -38,7 +38,6 @@ const options = {
   // fontH: 10, //?
   countVLabels: 3,
   axisTxtOffs: 8,
-  // fontBBoxHeight: 0,
   // biggestDataStrBBoxWidth: 0,  
   // svgElm: null,
   // rcClient: null,
@@ -88,7 +87,7 @@ function App() {
   const dataSets = useSelector(selDataSets);
 
 
-  const [date, setDate] = useState(Date.now());//1635839818003
+  const [date, setDate] = useState(new Date('01/05/2021'));//1635839818003
   const [range, setRange] = useState(24);
 
 
@@ -124,7 +123,11 @@ function App() {
 
   const fetchDataRange = (date, range) => {
     // console.log(date);
-    dispatch(getSensData({ date: 0, range: range, func: convertArrObjectsToObjectPropertyArrays }));//new Date(date).getDate() - 1
+    const sz = options.getStrBoundSize('888', 'txt-axis');
+    let stride = options.calcStride(sz.height, options.rcClient.right - options.rcClient.left, range/24);
+    // console.log("stride",stride);
+
+    dispatch(getSensData({ date: 0, range: range, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));//new Date(date).getDate() - 1
   }
 
   const addDateDay = (date, add) => {
@@ -155,6 +158,12 @@ function App() {
 
   useEffect(() => {
     console.log("App useEffect");
+
+
+    // const stride = options.calcRequest(range);
+    // console.log('stride', stride);
+
+
     fetchDataRange(date, range);
   }, []); // componentDidMount()
 
@@ -173,7 +182,7 @@ function App() {
         </LocalizationProvider>
 
         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-          <Button onClick={(e) => onAddDate(-1)} >One</Button>         
+          <Button onClick={(e) => onAddDate(-1)} >One</Button>
           <Button onClick={(e) => onAddDate(1)} >Two</Button>
         </ButtonGroup>
 
@@ -184,9 +193,9 @@ function App() {
           label="Age"
           onChange={(e) => onSetRange(e.target.value)}
         >
-          <MenuItem value={1*24}>1*24</MenuItem>
-          <MenuItem value={10*24}>10*24</MenuItem>
-          <MenuItem value={30*24}>30*24</MenuItem>
+          <MenuItem value={1 * 24}>1*24</MenuItem>
+          <MenuItem value={10 * 24}>10*24</MenuItem>
+          <MenuItem value={30 * 24}>30*24</MenuItem>
         </Select>
 
       </div>

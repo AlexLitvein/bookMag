@@ -19,11 +19,14 @@ function* fetchSensData(act) { // act = { date, count, func }
     // console.log('fetchSensData', act);
     try {
         // yield put(setLoading());
-        const receivedData = yield remote_data[act.payload.date].slice(0,act.payload.range);
+        // const receivedData = yield remote_data[act.payload.date].slice(0, act.payload.range);
+        const receivedData = yield remote_data[act.payload.date].slice(0, act.payload.range).filter((el, i) => {
+            return i % [act.payload.stride] === 0;
+        });
         // console.log('receivedData', receivedData);
         const data = yield call(act.payload.func, receivedData);
         yield delay(400);
-        yield put(setDataSet( data )); //{ data }
+        yield put(setDataSet(data)); //{ data }
         // yield put(setLoaded());
     } catch (e) {
         yield put(setError(e.message));
