@@ -20,12 +20,12 @@ function* fetchSensData(act) { // act = { date, count, func }
     try {
         // yield put(setLoading());
         // const receivedData = yield remote_data[act.payload.date].slice(0, act.payload.range);
-        const receivedData = yield remote_data[act.payload.date].slice(0, act.payload.range).filter((el, i) => {
+        const receivedData = yield remote_data[0].slice(act.payload.date.getDate(), act.payload.range*24).filter((el, i) => {
             return i % [act.payload.stride] === 0;
         });
         // console.log('receivedData', receivedData);
         const data = yield call(act.payload.func, receivedData);
-        yield delay(400);
+        yield delay(2000);
         yield put(setDataSet(data)); //{ data }
         // yield put(setLoaded());
     } catch (e) {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { ChartCursor } from "./ChartCursor";
+import Spinner from "./Spinner";
 import { AniPath, Axle, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
@@ -322,15 +323,15 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {/* {console.log('opt.rcClient before', opt.rcClient)} */}
 
             <path d="M0 -10h1">
-                <animate id="ani_set_data" ref={aniSetDataEl} begin="0s" attributeName="d" dur="0.5" to="M0 0h2" />
+                <animate id="ani_set_data" ref={aniSetDataEl} begin="0s" attributeName="d" dur="1ms" to="M0 0h2" />
             </path>
 
             {/* Для вычисления высоты и ширины текста */}
             <text x={-100} y={-100} ref={txtRef}>test</text>
 
-            <rect x="10" y="10" width="20" height="20" stroke="black" fill="none">
+            {/* <rect x="10" y="10" width="20" height="20" stroke="black" fill="none">
                 <animate id="animation" attributeName="width" attributeType="XML" values="20;10;20" begin="0s" dur="3s" repeatDur="indefinite" end="ani_p.begin" />
-            </rect>
+            </rect> */}
 
             <SvgMarker id={"mrkVHAxis"} cls={"mrk-axis"}
                 w={2} h={6}
@@ -356,6 +357,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             <ChartCursor svgElm={svgElm} options={opt} axis={axis} data={dataSets} />
 
 
+            <Spinner status={"Loading..."} bgnAniId={'ani_p'} endAniId={'ani_p'} options={opt} />
             {/* {console.log('opt.rcClient after', opt.rcClient)} */}
         </svg>
 

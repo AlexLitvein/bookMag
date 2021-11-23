@@ -88,7 +88,7 @@ function App() {
 
 
   const [date, setDate] = useState(new Date('01/05/2021'));//1635839818003
-  const [range, setRange] = useState(24);
+  const [range, setRange] = useState(1);
 
 
   // NOTE! входные данные массив объектов, например: 
@@ -127,7 +127,7 @@ function App() {
     let stride = options.calcStride(sz.height, options.rcClient.right - options.rcClient.left, range/24);
     // console.log("stride",stride);
 
-    dispatch(getSensData({ date: 0, range: range, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));//new Date(date).getDate() - 1
+    dispatch(getSensData({ date: date, range: range, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));//new Date(date).getDate() - 1
   }
 
   const addDateDay = (date, add) => {
@@ -182,8 +182,8 @@ function App() {
         </LocalizationProvider>
 
         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-          <Button onClick={(e) => onAddDate(-1)} >One</Button>
-          <Button onClick={(e) => onAddDate(1)} >Two</Button>
+          <Button onClick={(e) => onAddDate(range)} >One</Button>
+          <Button onClick={(e) => onAddDate(range)} >Two</Button>
         </ButtonGroup>
 
         <Select
@@ -193,9 +193,9 @@ function App() {
           label="Age"
           onChange={(e) => onSetRange(e.target.value)}
         >
-          <MenuItem value={1 * 24}>1*24</MenuItem>
-          <MenuItem value={10 * 24}>10*24</MenuItem>
-          <MenuItem value={30 * 24}>30*24</MenuItem>
+          <MenuItem value={1}>1</MenuItem>
+          <MenuItem value={7}>7</MenuItem>
+          <MenuItem value={30}>30</MenuItem>
         </Select>
 
       </div>
