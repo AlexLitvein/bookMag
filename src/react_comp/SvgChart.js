@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { selStatus, STATUS } from "../dataRdcrs/paths";
 import { ChartCursor } from "./ChartCursor";
 import Spinner from "./Spinner";
 import { AniPath, Axle, ChartAxis, SvgMarker } from "./SvgComps";
@@ -12,6 +14,8 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const svgElm = useRef(null);
     const txtRef = useRef(null);
     const aniSetDataEl = useRef(null);
+
+    const status = useSelector(selStatus);
 
     // let { width, height } = svgElm.current?.parentElement.getBoundingClientRect();
     // const [sz, setSize] = useState({ width, height });
@@ -302,7 +306,17 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         // return renderDataSets();
     }, [dataSets, sz]);
 
-    useEffect(() => { aniSetDataEl.current?.beginElement(); }, [dataSets]);
+    // useEffect(() => { aniSetDataEl.current?.beginElement(); }, [dataSets]);
+    // useEffect(() => {
+    //     if (status === STATUS.LOADING) {
+    //         console.log('STATUS.LOADING');
+
+    //         aniSetDataEl.current?.beginElement();
+    //     }
+    //     if (status === STATUS.LOADED) {
+    //         aniSetDataEl.current?.endElement();
+    //     }
+    // }, [status]);
 
     useEffect(() => {
         console.log("SvgChart useEffect");
@@ -322,8 +336,12 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {/* {console.log('opt.rcClient before', opt.rcClient)} */}
 
-            <path d="M0 -10h1">
-                <animate id="ani_set_data" ref={aniSetDataEl} begin="0s" attributeName="d" dur="1ms" to="M0 0h2" />
+            {/* <path className="path-data" style={{stroke: 'blue'}} d="M0 10h10">
+                <animate id="ani_set_data" ref={aniSetDataEl} begin="indefinite" attributeName="d" dur="20s" to="M0 10h200" fill="freeze" />
+            </path> */}
+
+            <path className="path-data" style={{ stroke: 'blue' }} d="M0 10h10">
+                <animate id="ani_set_data" ref={aniSetDataEl} begin="0s" attributeName="d" dur="5s" to="M0 10h200" fill="freeze" />
             </path>
 
             {/* Для вычисления высоты и ширины текста */}
@@ -343,7 +361,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             {renderVTextAxis(opt.rcClient, '_id', dataSets)}
             {renderMarkers()}
             {/* {renderPathAxis(opt.rcClient, axis)} */}
-            
+
             <ChartAxis axis={axis} options={options} />
 
 
@@ -361,7 +379,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             <ChartCursor svgElm={svgElm} options={options} axis={axis} data={dataSets} />
 
 
-            <Spinner status={"Loading..."} bgnAniId={'ani_p'} endAniId={'ani_p'} options={opt} />
+            {/* <Spinner status={"Loading..."} bgnAniId={'ani_set_data'} endAniId={'ani_p'} options={opt} /> */}
             {/* {console.log('opt.rcClient after', opt.rcClient)} */}
         </svg>
 

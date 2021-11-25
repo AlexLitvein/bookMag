@@ -50,7 +50,8 @@ export const AniPath = ({ id, options, axle, data }) => {
             className={'path-data'}
             style={{ stroke: axle.clrPath, marker: `url("#mrk_${id}")` }}
             d={td.d}>
-            <animate id={`ani_${id}`} begin="ani_set_data.begin" attributeName="d" dur="0.3" fill="freeze" to={td.t} />
+            {/* <animate id={`ani_${id}`} begin="ani_set_data.end" attributeName="d" dur="300ms" fill="freeze" to={td.t} /> */}
+            <animate id={`ani_${id}`} begin="0s" attributeName="d" dur="3s" fill="freeze" to={td.t} />
         </path>
     );
 }
