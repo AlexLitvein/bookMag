@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { ChartCursor } from "./ChartCursor";
 import Spinner from "./Spinner";
-import { AniPath, Axle, SvgMarker } from "./SvgComps";
+import { AniPath, Axle, ChartAxis, SvgMarker } from "./SvgComps";
 import { TextGroup } from "./SvgTextGroup";
 
 const SvgChart = ({ options, axis, dataSets = [] }) => {
-    console.log('call SvgChart', dataSets);
+    console.log('call SvgChart'); // , dataSets
 
     let opt = options;
 
@@ -18,7 +18,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
     const [sz, setSize] = useState({ w: 480, h: 320, });
 
     // WARNING: ширину линии использовать кратную 2 пикселям, координаты целочисоенные
-    const cut = (n) => Math.trunc(n); // лучше отсекать, чем округлять, иначе сумма сегментов иногда будет больше отрезка в который они должны уложиться 
+    opt.cut = (n) => Math.trunc(n); // лучше отсекать, чем округлять, иначе сумма сегментов иногда будет больше отрезка в который они должны уложиться 
 
     // const cut = (n) => Math.ceil(n);
     // const cut = (n) => (Math.trunc(n * 10)) / 10;
@@ -40,21 +40,21 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     opt.numHSeg = dataSets.length !== 0 ? dataSets[0]._id.length - 1 : 1;
     opt.numVSeg = options.countVLabels - 1;
-    opt.lnHSeg = cut((sz.w - options.padding.left - options.padding.right) / opt.numHSeg);
-    opt.lnVSeg = cut((sz.h - options.padding.top - options.padding.bottom) / opt.numVSeg);
+    opt.lnHSeg = opt.cut((sz.w - options.padding.left - options.padding.right) / opt.numHSeg);
+    opt.lnVSeg = opt.cut((sz.h - options.padding.top - options.padding.bottom) / opt.numVSeg);
     opt.rcClient = _clientRect();
 
-    options.getOrthoLine = (x, y, size, numSeg, type) => {
-        let d = `M${cut(x)} ${cut(y)}`;
-        let pos = type === 'H' ? x : y;
-        // let lnSeg = size / numSeg;
-        let lnSeg = type === 'H' ? opt.lnHSeg : opt.lnVSeg;
-        for (let i = 1; i <= numSeg; i++) {
-            // d += type + cut(pos + lnSeg * i);
-            d += type + (pos + lnSeg * i);
-        }
-        return d;
-    }
+    // options.getOrthoLine = (x, y, size, numSeg, type) => {
+    //     let d = `M${cut(x)} ${cut(y)}`;
+    //     let pos = type === 'H' ? x : y;
+    //     // let lnSeg = size / numSeg;
+    //     let lnSeg = type === 'H' ? opt.lnHSeg : opt.lnVSeg;
+    //     for (let i = 1; i <= numSeg; i++) {
+    //         // d += type + cut(pos + lnSeg * i);
+    //         d += type + (pos + lnSeg * i);
+    //     }
+    //     return d;
+    // }
 
     options.getOrthoPath = (x, y, size, numSeg, type) => {
         let d = 'M';
@@ -63,7 +63,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         let lnSeg = size / numSeg;
         for (let i = 0; i <= numSeg; i++) {
             // d += type + cut(pos + lnSeg * i);
-            d += `${cut(posX + lnSeg * i)} ${posY}`;
+            d += `${opt.cut(posX + lnSeg * i)} ${posY}`;
             if (i < numSeg) { d += 'L'; }
         }
         return d;
@@ -82,15 +82,15 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         }
         return stride || 1;
     }
-    const buildAxlePath = (rc, type) => {
-        return options.getOrthoLine(
-            rc.left,
-            type === 'H' ? rc.top + (opt.lnVSeg * opt.numVSeg) : rc.top,
-            type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
-            type === 'H' ? opt.numHSeg : opt.numVSeg,
-            type
-        );
-    }
+    // const buildAxlePath = (rc, type) => {
+    //     return options.getOrthoLine(
+    //         rc.left,
+    //         type === 'H' ? rc.top + (opt.lnVSeg * opt.numVSeg) : rc.top,
+    //         type === 'H' ? (rc.right - rc.left) : (rc.bottom - rc.top),
+    //         type === 'H' ? opt.numHSeg : opt.numVSeg,
+    //         type
+    //     );
+    // }
 
     const calcPadding = () => {
         let szHText = { width: 0, height: 0 };
@@ -120,20 +120,20 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             if (cls) txtRef.current.setAttribute('class', cls);
             bbox = txtRef.current.getBBox();
         }
-        return { width: cut(bbox.width), height: cut(bbox.height) };
+        return { width: opt.cut(bbox.width), height: opt.cut(bbox.height) };
     }
 
-    const renderPathAxis = (rc, axis) => {
-        console.log("renderPathAxis");
-        const out = [];
-        for (const key in axis) {
-            const el = axis[key];
-            out.push(
-                <Axle key={key} d={buildAxlePath(rc, el.type)} cls={el.cls} />
-            );
-        }
-        return out;
-    }
+    // const renderPathAxis = (rc, axis) => {
+    //     console.log("renderPathAxis");
+    //     const out = [];
+    //     for (const key in axis) {
+    //         const el = axis[key];
+    //         out.push(
+    //             <Axle key={key} d={buildAxlePath(rc, el.type)} cls={el.cls} />
+    //         );
+    //     }
+    //     return out;
+    // }
 
     const _formatDateStr = (str) => {
         let data = new Date(str);
@@ -146,7 +146,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         let arrStrs = arrDataSets.length !== 0 ? arrDataSets[0][dataFieldText] : [];
         const tmpStr = _formatDateStr(arrStrs[0]);
         const sz = opt.getStrBoundSize(tmpStr, 'txt-axis');
-        let dx = cut(sz.height >> 2);
+        let dx = opt.cut(sz.height >> 2);
 
         opt.padding.bottom = Math.max(opt.padding.bottom, sz.width + options.axisTxtOffs * 0);
 
@@ -172,7 +172,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
             }
         });
 
-        return <TextGroup x={rc.left + dx} y={rc.bottom + options.axisTxtOffs} orient={'V'} offsX={cut(opt.lnHSeg)} offsY={0} texts={arrStrs} />;
+        return <TextGroup x={rc.left + dx} y={rc.bottom + options.axisTxtOffs} orient={'V'} offsX={opt.cut(opt.lnHSeg)} offsY={0} texts={arrStrs} />;
     }
 
     const renderHTextAxle = (x, y, axle) => {
@@ -194,7 +194,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         const res = [];
         const sz = opt.getStrBoundSize('test');
         let cntAxis = Object.keys(axis).length - 1; // -1 тк первая ось горизонтальная
-        let startPos = cut(rc.top - ((cntAxis * sz.height) / 2) * 1.15);
+        let startPos = opt.cut(rc.top - ((cntAxis * sz.height) / 2) * 1.15);
         for (const key in axis) {
             if (axis[key].type === 'H') {
                 continue;
@@ -209,7 +209,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         // возвращаются float коорд
         // setW(cut(width));
         // setH(cut(height));
-        setSize({ w: cut(width), h: cut(height), })
+        setSize({ w: opt.cut(width), h: opt.cut(height), })
 
         // console.log('resize height', height);
     }
@@ -339,10 +339,14 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
                 mrkEl={<line x2="0" y2="6" />}
             />
 
-            {renderMarkers()}
-            {renderPathAxis(opt.rcClient, axis)}
-            {renderVTextAxis(opt.rcClient, '_id', dataSets)}
             {renderHTextAxis(opt.rcClient)}
+            {renderVTextAxis(opt.rcClient, '_id', dataSets)}
+            {renderMarkers()}
+            {/* {renderPathAxis(opt.rcClient, axis)} */}
+            
+            <ChartAxis axis={axis} options={options} />
+
+
 
             {/* {
                 dataSets.map((itm, idx) => {
@@ -354,7 +358,7 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {renderedDataSet}
 
-            <ChartCursor svgElm={svgElm} options={opt} axis={axis} data={dataSets} />
+            <ChartCursor svgElm={svgElm} options={options} axis={axis} data={dataSets} />
 
 
             <Spinner status={"Loading..."} bgnAniId={'ani_p'} endAniId={'ani_p'} options={opt} />

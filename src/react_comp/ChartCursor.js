@@ -5,8 +5,8 @@ export function ChartCursor({ svgElm, options, axis, data }) {
 
     options.noteW = 0;
     options.noteH = options.axisTxtOffs;
+    const [pos, setPos] = useState({ x: 0, y: 0 });
 
-    const [pos, setPos] = useState({ x: options.rcClient.right, y: options.rcClient.top });
     const testPos = (x, y) => {
         const right = options.rcClient.left + options.lnHSeg * options.numHSeg;
         x = x < options.rcClient.left ? options.rcClient.left : x;
@@ -66,6 +66,10 @@ export function ChartCursor({ svgElm, options, axis, data }) {
     }
 
     useEffect(() => {
+        setPos(testPos(options.rcClient.left + options.lnHSeg, options.rcClient.top));
+    }, [options.rcClient]);
+
+    useEffect(() => {
         svgElm.current.addEventListener('click', (e) => {
             console.log('click');
             setPos(testPos(e.offsetX, e.offsetY));
@@ -77,7 +81,6 @@ export function ChartCursor({ svgElm, options, axis, data }) {
                 setPos(testPos(e.offsetX, e.offsetY));
             }
         });
-
     }, []); // componentDidMount()
 
     return (
@@ -91,13 +94,10 @@ export function ChartCursor({ svgElm, options, axis, data }) {
 }
 
 export function FlyNote({ x, y, options, arrStr }) {
-    // console.log('FlyNote gObj', gObj);
     const testPos = (x, y) => {
-        // let out = { x: x, y: y, };
         let out = { x, y };
         const right = options.rcClient.left + options.lnHSeg * options.numHSeg
         if (out.x + options.noteW > right) {
-            // if (out.x + options.noteW > options.rcClient.right) {
             out.x = out.x - options.noteW;
         }
         if (out.y + options.noteH > options.rcClient.bottom) {
@@ -115,7 +115,6 @@ export function FlyNote({ x, y, options, arrStr }) {
         `)
     }
 
-    // const [pos, setPos] = useState({ x: 0, y: 0 });
     const [pos, setPos] = useState({ x, y });
     useEffect(() => {
         setPos(testPos(x, y));

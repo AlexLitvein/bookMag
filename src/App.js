@@ -13,16 +13,8 @@ import ruLocale from 'date-fns/locale/ru';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 
-// import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-// import {DatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
-// import AdapterDateFns from '@date-io/date-fns';
-
-// const localeMap = {
-
-//   ru: ruLocale,
-// };
 
 const axis = {
   _id: { name: 'Дата', min: 0, max: 0, type: 'H', cls: 'axis', clrPath: '#000ff00' },
@@ -31,14 +23,10 @@ const axis = {
   h: { name: 'Влажность', min: 0, max: 100, type: 'V', cls: 'axis', clrPath: '#FFFA40' },
 };
 
-// const marker
-
 const options = {
   padding: { top: 20, right: 10, bottom: 60, left: 30 },
-  // fontH: 10, //?
   countVLabels: 3,
   axisTxtOffs: 8,
-  // biggestDataStrBBoxWidth: 0,  
   // svgElm: null,
   // rcClient: null,
   // numHSeg: 0,
@@ -46,40 +34,40 @@ const options = {
   // lnVSeg: 0,
 };
 
-function requestSensDataUrlencoded(data, range) {
-  // if (document.forms[0].checkValidity()) {
-  const body = 'startData=' + encodeURIComponent(data) +
-    '&range=' + encodeURIComponent(range);
-  const xhr = new XMLHttpRequest();
-  xhr.timeout = 3000; // (в миллисекундах)
-  xhr.open('POST', '/weather/getSensData', true);
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.send(body);
+// function requestSensDataUrlencoded(data, range) {
+//   // if (document.forms[0].checkValidity()) {
+//   const body = 'startData=' + encodeURIComponent(data) +
+//     '&range=' + encodeURIComponent(range);
+//   const xhr = new XMLHttpRequest();
+//   xhr.timeout = 3000; // (в миллисекундах)
+//   xhr.open('POST', '/weather/getSensData', true);
+//   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+//   xhr.send(body);
 
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-      // mArrDbData = JSON.parse(this.responseText);
-      //if (mArrDbData.length !== 0) {
-      //console.log('m_arrDbData len: %d', mArrDbData.length);
+//   xhr.onreadystatechange = function () {
+//     if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+//       // mArrDbData = JSON.parse(this.responseText);
+//       //if (mArrDbData.length !== 0) {
+//       //console.log('m_arrDbData len: %d', mArrDbData.length);
 
-      // Draw();
-      // mGraph.drawGraph(mArrDbData, parseInt(range));
-      //}
-    }
-  }
-  // }
-}
+//       // Draw();
+//       // mGraph.drawGraph(mArrDbData, parseInt(range));
+//       //}
+//     }
+//   }
+//   // }
+// }
 
-function fetchJson(url) {
-  return fetch(url)
-    .then(request => request.text())
-    .then(text => {
-      return JSON.parse(text);
-    })
-    .catch(error => {
-      console.log();
-    });
-}
+// function fetchJson(url) {
+//   return fetch(url)
+//     .then(request => request.text())
+//     .then(text => {
+//       return JSON.parse(text);
+//     })
+//     .catch(error => {
+//       console.log();
+//     });
+// }
 
 // TODO: перенести статус загрузки в pathRdcr
 function App() {
@@ -127,7 +115,7 @@ function App() {
     let stride = options.calcStride(sz.height, options.rcClient.right - options.rcClient.left, range/24);
     // console.log("stride",stride);
 
-    dispatch(getSensData({ date: date, range: range, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));//new Date(date).getDate() - 1
+    dispatch(getSensData({ date: date, range: range, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));
   }
 
   const addDateDay = (date, add) => {
@@ -154,16 +142,8 @@ function App() {
     });
   }
 
-
-
   useEffect(() => {
     console.log("App useEffect");
-
-
-    // const stride = options.calcRequest(range);
-    // console.log('stride', stride);
-
-
     fetchDataRange(date, range);
   }, []); // componentDidMount()
 
