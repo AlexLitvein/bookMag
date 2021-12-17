@@ -111,14 +111,15 @@ function App() {
 
   const fetchDataRange = (date, range) => {
     // console.log(date);
+    const count = 24 + 1; // 00 часов след дня
     const sz = options.getStrBoundSize('888', 'txt-axis');
-    let stride = options.calcStride(sz.height, options.rcClient.right - options.rcClient.left, range/24);
+    let stride = options.calcStride(sz.height, options.rcClient.right - options.rcClient.left, range * count);
     // console.log("stride",stride);
 
-    dispatch(getSensData({ date: date, range: range, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));
+    dispatch(getSensData({ date: date, range: range * count, stride: stride, func: convertArrObjectsToObjectPropertyArrays }));
   }
 
-  const addDateDay = (date, add) => {
+  const addDays = (date, add) => {
     const dt = new Date(date);
     dt.setDate(dt.getDate() + add);
     return dt;
@@ -136,7 +137,7 @@ function App() {
 
   const onAddDate = (add) => {
     setDate((prev) => {
-      const res = addDateDay(prev, add);
+      const res = addDays(prev, add);
       fetchDataRange(res, range);
       return res;
     });
@@ -162,8 +163,8 @@ function App() {
         </LocalizationProvider>
 
         <ButtonGroup variant="contained" aria-label="outlined primary button group">
-          <Button onClick={(e) => onAddDate(range)} >One</Button>
-          <Button onClick={(e) => onAddDate(range)} >Two</Button>
+          <Button onClick={(e) => onAddDate(-range)} >&lt;</Button>
+          <Button onClick={(e) => onAddDate(range)} >&gt;</Button>
         </ButtonGroup>
 
         <Select

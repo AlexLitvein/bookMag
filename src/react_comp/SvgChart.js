@@ -73,13 +73,26 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return d;
     }
 
+    // options.calcStride = (minLen, totalLen, count) => {
+    //     let i = 24, stride = 0;
+    //     for (; i > 0; i--) {
+    //         if (24 % i === 0) {
+    //             let dxVLine = totalLen / (i * count);
+    //             if (dxVLine > minLen) {
+    //                 stride = 24 / i;
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     return stride || 1;
+    // }
     options.calcStride = (minLen, totalLen, count) => {
-        let i = 24, stride = 0;
+        let i = count, stride = 0;
         for (; i > 0; i--) {
-            if (24 % i === 0) {
-                let dxVLine = totalLen / (i * count);
+            if (count % i === 0) {
+                let dxVLine = totalLen / i;
                 if (dxVLine > minLen) {
-                    stride = 24 / i;
+                    stride = count / i;
                     break;
                 }
             }

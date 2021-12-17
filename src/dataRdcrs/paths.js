@@ -1,10 +1,5 @@
-// import MyGraph from "../classes/ChartObject";
-
 export const GET_SENS_DATA = 'GET_SENS_DATA';
 export const SET_DATA_SET = 'SET_DATA_SET';
-// export const SET_PATH = 'SET_PATH';
-// export const SET_RESIZE_PATHS = 'SET_RESIZE_PATHS';
-// export const SET_TEXT = 'SET_TEXT';
 export const SET_STATUS = 'SET_STATUS';
 export const STATUS = {
     EMPTY: 0,
@@ -13,12 +8,6 @@ export const STATUS = {
     ERROR: 3,
 };
 
-// export const setText = (payload) => {
-//     return {
-//         type: SET_TEXT,
-//         payload,
-//     }
-// };
 export const setStatus = (payload) => {
     return {
         type: SET_STATUS,
@@ -54,7 +43,6 @@ export const getSensData = (payload,) => { // date, count, func
 const initialState = {
     dataSets: [],
     status: STATUS.EMPTY,
-    // text: { t1: 'text1', t2: 'text2' },
 };
 
 export const selDataSets = (state) => state.chartData.dataSets;
@@ -65,27 +53,16 @@ export function dataSetsRdcr(state = initialState, action) {
     // console.log('pathRdcr', action);
 
     switch (action.type) {
-        // case SET_TEXT:
-        //     // console.log('action.SET_ANI_PATH:', state.aniPaths);            
-        //     return {
-        //         ...state,
-        //         text: { ...action.payload },
-        //         // text: { ...state.text, ...action.payload },
-        //     };
 
-        case SET_STATUS:
-            // console.log('action.SET_ANI_PATH:', state.aniPaths);            
+        case SET_STATUS:       
             return {
                 ...state,
                 status:  action.payload,
-                // text: { ...state.text, ...action.payload },
             };
 
-        case SET_DATA_SET:
-            // console.log('action.SET_ANI_PATH:', state.aniPaths);           
+        case SET_DATA_SET:       
             return {
                 ...state,
-                // dataSets: [...state.dataSets, action.payload],
                 dataSets: [action.payload],
             };
 
