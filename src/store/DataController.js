@@ -26,7 +26,7 @@ function* fetchSensData(act) { // act = { date, count, func }
         });
         // console.log('receivedData', receivedData);
         const data = yield call(act.payload.func, receivedData);
-        yield delay(2000);
+        yield delay(1000);
         yield put(setDataSet(data)); //{ data }
 
         // yield put(setStatus(STATUS.LOADED));

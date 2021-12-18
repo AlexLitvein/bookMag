@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { selStatus, STATUS } from "../dataRdcrs/paths";
+// import { selStatus, STATUS } from "../dataRdcrs/paths";
 import { ChartCursor } from "./ChartCursor";
 import Spinner from "./Spinner";
 import { AniPath, Axle, ChartAxis, SvgMarker } from "./SvgComps";
@@ -13,9 +13,9 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     const svgElm = useRef(null);
     const txtRef = useRef(null);
-    const aniSetDataEl = useRef(null);
+    const aniTrigEl = useRef(null);
 
-    const status = useSelector(selStatus);
+    // const status = useSelector(selStatus);
 
     // let { width, height } = svgElm.current?.parentElement.getBoundingClientRect();
     // const [sz, setSize] = useState({ width, height });
@@ -282,12 +282,13 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
     // const renderDataSets = () => {
     //     const out = dataSets.map((itm, idx) => {
-    //         return renderDataSet(itm);
+    //         return renderDataSet(itm, idx);
     //     });
 
-    //     // aniSetDataEl.current?.beginElement();
-
+    //     // aniTrigEl.current?.beginElement();
     //     return out;
+
+    //         // return dataSets.map((itm, idx) => renderDataSet(itm, idx));
     // }
 
     const renderMarkers = () => {
@@ -306,28 +307,33 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
         return out;
     }
 
-    const renderedDataSet = useMemo(() => {
-        // const out = [];
-        console.log("useMemo");
+    // const renderedDataSet = useMemo(() => {
+    //     // const out = [];
+    //     console.log("useMemo");
 
-        // aniSetDataEl?.current.beginElement();
+    //     // aniTrigEl.current?.beginElement();
 
-        return dataSets.map((itm, idx) => {
-            return renderDataSet(itm, idx);
-        });
+    //     return dataSets.map((itm, idx) => {
+    //         return renderDataSet(itm, idx);
+    //     });
 
-        // return renderDataSets();
-    }, [dataSets, sz]);
+    //     // return renderDataSets();
+    // }, [dataSets, sz]);//
 
-    // useEffect(() => { aniSetDataEl.current?.beginElement(); }, [dataSets]);
+    useEffect(() => {
+        if (dataSets.length !== 0) {
+            aniTrigEl.current?.beginElement();
+        }
+    }, [dataSets]);
+
     // useEffect(() => {
     //     if (status === STATUS.LOADING) {
     //         console.log('STATUS.LOADING');
 
-    //         aniSetDataEl.current?.beginElement();
+    //         aniTrigEl.current?.beginElement();
     //     }
     //     if (status === STATUS.LOADED) {
-    //         aniSetDataEl.current?.endElement();
+    //         aniTrigEl.current?.endElement();
     //     }
     // }, [status]);
 
@@ -349,13 +355,13 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
             {/* {console.log('opt.rcClient before', opt.rcClient)} */}
 
-            {/* <path className="path-data" style={{stroke: 'blue'}} d="M0 10h10">
-                <animate id="ani_set_data" ref={aniSetDataEl} begin="indefinite" attributeName="d" dur="20s" to="M0 10h200" fill="freeze" />
-            </path> */}
-
-            <path className="path-data" style={{ stroke: 'blue' }} d="M0 10h10">
-                <animate id="ani_set_data" ref={aniSetDataEl} begin="0s" attributeName="d" dur="5s" to="M0 10h200" fill="freeze" />
+            <path className="path-data" style={{ stroke: 'blue' }} d="M0 -10h10">
+                <animate id="ani_trigg" ref={aniTrigEl} begin="indefinite" attributeName="d" dur="0s" to="M0 -10h20" fill="freeze" />
             </path>
+
+            {/* <path className="path-data" style={{ stroke: 'blue' }} d="M0 10h10">
+                <animate id="ani-trigg" ref={aniTrigEl} begin="0s" attributeName="d" dur="1s" to="M0 10h200" fill="freeze" />
+            </path> */}
 
             {/* Для вычисления высоты и ширины текста */}
             <text x={-100} y={-100} ref={txtRef}>test</text>
@@ -379,20 +385,20 @@ const SvgChart = ({ options, axis, dataSets = [] }) => {
 
 
 
-            {/* {
+            {
                 dataSets.map((itm, idx) => {
-                    return renderDataSet(itm);
+                    return renderDataSet(itm, idx);
                 })
-            } */}
+            }
 
             {/* {console.log('renderedDataSet', renderedDataSet)} */}
-
-            {renderedDataSet}
+            {/* {renderDataSets} */}
+            {/* {renderedDataSet} */}
 
             <ChartCursor svgElm={svgElm} options={options} axis={axis} data={dataSets} />
 
 
-            {/* <Spinner status={"Loading..."} bgnAniId={'ani_set_data'} endAniId={'ani_p'} options={opt} /> */}
+            {/* <Spinner status={"Loading..."} bgnAniId={'ani-trigg'} endAniId={'ani_p'} options={opt} /> */}
             {/* {console.log('opt.rcClient after', opt.rcClient)} */}
         </svg>
 
